@@ -26,6 +26,7 @@ export class IngredientsService {
     addIngredientInput: AddIngredientInput,
   ): Promise<IngredientDTO> {
     const newIngredientBE = await new this.ingredientModel({
+      recipeID: addIngredientInput.recipeID,
       name: addIngredientInput.name,
       amount: addIngredientInput.amount,
       unit: addIngredientInput.unit,
