@@ -1,6 +1,5 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { IngredientDTO } from '../graphql';
 
 @Schema()
 export class IngredientBE extends Document {

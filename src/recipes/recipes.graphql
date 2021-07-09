@@ -1,52 +1,52 @@
 type IngredientDTO {
-    id: String!
-    name: String!
-    amount: Float!
-    unit: String!
+  id: String!
+  name: String!
+  amount: Float!
+  unit: String!
 }
 
 type RecipeDTO {
-    id: String!
-    name: String!
-    ingredients: [IngredientDTO]
+  id: String!
+  name: String!
+  ingredients: [IngredientDTO]
 }
 
 input CreateRecipeInput {
-    name: String!
-    ingredientIDs: [String]
+  name: String!
+  ingredientIDs: [String]
 }
 
 input UpdateRecipeInput {
-    id: String!
-    name: String
+  id: String!
+  name: String
 }
 
 input AddIngredientInput {
-    recipeID: String!
-    name: String!
-    amount: Float!
-    unit: String!
+  recipeID: String!
+  name: String!
+  amount: Float!
+  unit: String!
 }
 
 input UpdateIngredientInput {
-    id: String!
-    name: String
-    amount: Float
-    unit: String
+  id: String!
+  name: String
+  amount: Float
+  unit: String
 }
 
 type Query {
-    recipes: [RecipeDTO]
-    recipe(id: String!): RecipeDTO
-    recipeIngredients: [IngredientDTO]
-    ingredient(id: String!): IngredientDTO
+  recipes: [RecipeDTO]
+  recipe(id: String!): RecipeDTO
+  recipeIngredients: [IngredientDTO]
+  ingredient(id: String!): IngredientDTO
 }
 
 type Mutation {
-    createRecipe(createRecipeInput: CreateRecipeInput): RecipeDTO
-    updateRecipe(updateRecipeInput: UpdateRecipeInput): RecipeDTO
-    deleteRecipe(id: String!): Boolean
-    addIngredient(addIngredientInput: AddIngredientInput): IngredientDTO
-    updateIngredient(updateIngredientInput: UpdateIngredientInput): IngredientDTO
-    removeIngredient(ingredientID: String!, recipeID: String): Boolean
+  createRecipe(createRecipeInput: CreateRecipeInput): RecipeDTO
+  updateRecipe(updateRecipeInput: UpdateRecipeInput): RecipeDTO
+  deleteRecipe(id: String!): Boolean
+  addIngredient(addIngredientInput: AddIngredientInput): IngredientDTO
+  updateIngredient(updateIngredientInput: UpdateIngredientInput): IngredientDTO
+  removeIngredient(ingredientID: String!, recipeID: String): Boolean
 }
