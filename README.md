@@ -17,7 +17,7 @@ npm install
 Running the dev server:
 
 ```bash
-npm run start:dev
+npm run dev
 ```
 
 ## Running in production
