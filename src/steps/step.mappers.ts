@@ -1,0 +1,13 @@
+import { StepDTO } from '../graphql';
+import { StepBE } from './step.schema';
+
+export default class StepMappers {
+  static BEtoDTO(stepBE: StepBE): StepDTO {
+    return {
+      id: stepBE._id,
+      name: stepBE.name,
+      description: stepBE.description,
+      image: stepBE.image,
+    };
+  }
+}

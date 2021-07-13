@@ -1,3 +1,10 @@
+type StepDTO {
+  id: String!
+  name: String!
+  description: String
+  image: String
+}
+
 type IngredientDTO {
   id: String!
   name: String!
@@ -9,16 +16,21 @@ type RecipeDTO {
   id: String!
   name: String!
   ingredients: [IngredientDTO]
+  steps: [StepDTO]
+  tags: [String]
 }
 
 input CreateRecipeInput {
   name: String!
   ingredientIDs: [String]
+  stepIDs: [String]
+  tags: [String]
 }
 
 input UpdateRecipeInput {
   id: String!
   name: String
+  tags: [String]
 }
 
 input AddIngredientInput {
@@ -35,11 +47,23 @@ input UpdateIngredientInput {
   unit: String
 }
 
+input AddStepInput {
+  recipeID: String!
+  name: String!
+  description: String
+  image: String
+}
+
+input UpdateStepInput {
+  id: String!
+  name: String
+  description: String
+  image: String
+}
+
 type Query {
   recipes: [RecipeDTO]
   recipe(id: String!): RecipeDTO
-  recipeIngredients: [IngredientDTO]
-  ingredient(id: String!): IngredientDTO
 }
 
 type Mutation {
@@ -49,4 +73,7 @@ type Mutation {
   addIngredient(addIngredientInput: AddIngredientInput): IngredientDTO
   updateIngredient(updateIngredientInput: UpdateIngredientInput): IngredientDTO
   removeIngredient(ingredientID: String!, recipeID: String): Boolean
+  addStep(addStepInput: AddStepInput): StepDTO
+  updateStep(updateStepInput: UpdateStepInput): StepDTO
+  removeStep(stepID: String!, recipeID: String): Boolean
 }

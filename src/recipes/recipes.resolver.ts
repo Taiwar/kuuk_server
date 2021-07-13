@@ -8,13 +8,16 @@ import {
 } from '@nestjs/graphql';
 import {
   AddIngredientInput,
+  AddStepInput,
   CreateRecipeInput,
   IngredientDTO,
   RecipeDTO,
+  StepDTO,
   UpdateIngredientInput,
   UpdateRecipeInput,
 } from '../graphql';
 import { IngredientsService } from '../ingredients/ingredients.service';
+import { StepsService } from '../steps/steps.service';
 import { RecipesService } from './recipes.service';
 
 @Resolver('RecipeDTO')
@@ -22,7 +25,14 @@ export class RecipesResolver {
   constructor(
     private recipesService: RecipesService,
     private ingredientsService: IngredientsService,
+    private stepService: StepsService,
   ) {}
+
+  @ResolveField()
+  async steps(@Parent() recipe): Promise<StepDTO[]> {
+    const { id } = recipe;
+    return this.stepService.findAllByRecipeID(id);
+  }
 
   @Query()
   async recipes(): Promise<RecipeDTO[]> {
@@ -59,11 +69,6 @@ export class RecipesResolver {
     return this.ingredientsService.findAllByRecipeID(id);
   }
 
-  @Query()
-  async ingredient(@Args('id') id: string): Promise<IngredientDTO> {
-    return this.ingredientsService.findOneById(id);
-  }
-
   @Mutation()
   async addIngredient(
     @Args('addIngredientInput') addIngredientInput: AddIngredientInput,
@@ -84,5 +89,27 @@ export class RecipesResolver {
     @Args('recipeId') recipeId: string,
   ): Promise<boolean> {
     return this.recipesService.removeIngredient(ingredientId, recipeId);
+  }
+
+  @Mutation()
+  async addStep(
+    @Args('addStepInput') addStepInput: AddStepInput,
+  ): Promise<StepDTO> {
+    return this.recipesService.addStep(addStepInput);
+  }
+
+  @Mutation()
+  async updateStep(
+    @Args('updateIngredientInput') updateIngredientInput: UpdateIngredientInput,
+  ): Promise<StepDTO> {
+    return this.stepService.update(updateIngredientInput);
+  }
+
+  @Mutation()
+  async removeStep(
+    @Args('stepId') stepId: string,
+    @Args('recipeId') recipeId: string,
+  ): Promise<boolean> {
+    return this.recipesService.removeStep(stepId, recipeId);
   }
 }

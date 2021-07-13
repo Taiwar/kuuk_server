@@ -10,11 +10,14 @@
 export interface CreateRecipeInput {
     name: string;
     ingredientIDs?: Nullable<Nullable<string>[]>;
+    stepIDs?: Nullable<Nullable<string>[]>;
+    tags?: Nullable<Nullable<string>[]>;
 }
 
 export interface UpdateRecipeInput {
     id: string;
     name?: Nullable<string>;
+    tags?: Nullable<Nullable<string>[]>;
 }
 
 export interface AddIngredientInput {
@@ -31,6 +34,27 @@ export interface UpdateIngredientInput {
     unit?: Nullable<string>;
 }
 
+export interface AddStepInput {
+    recipeID: string;
+    name: string;
+    description?: Nullable<string>;
+    image?: Nullable<string>;
+}
+
+export interface UpdateStepInput {
+    id: string;
+    name?: Nullable<string>;
+    description?: Nullable<string>;
+    image?: Nullable<string>;
+}
+
+export interface StepDTO {
+    id: string;
+    name: string;
+    description?: Nullable<string>;
+    image?: Nullable<string>;
+}
+
 export interface IngredientDTO {
     id: string;
     name: string;
@@ -42,13 +66,13 @@ export interface RecipeDTO {
     id: string;
     name: string;
     ingredients?: Nullable<Nullable<IngredientDTO>[]>;
+    steps?: Nullable<Nullable<StepDTO>[]>;
+    tags?: Nullable<Nullable<string>[]>;
 }
 
 export interface IQuery {
     recipes(): Nullable<Nullable<RecipeDTO>[]> | Promise<Nullable<Nullable<RecipeDTO>[]>>;
     recipe(id: string): Nullable<RecipeDTO> | Promise<Nullable<RecipeDTO>>;
-    recipeIngredients(): Nullable<Nullable<IngredientDTO>[]> | Promise<Nullable<Nullable<IngredientDTO>[]>>;
-    ingredient(id: string): Nullable<IngredientDTO> | Promise<Nullable<IngredientDTO>>;
 }
 
 export interface IMutation {
@@ -58,6 +82,9 @@ export interface IMutation {
     addIngredient(addIngredientInput?: Nullable<AddIngredientInput>): Nullable<IngredientDTO> | Promise<Nullable<IngredientDTO>>;
     updateIngredient(updateIngredientInput?: Nullable<UpdateIngredientInput>): Nullable<IngredientDTO> | Promise<Nullable<IngredientDTO>>;
     removeIngredient(ingredientID: string, recipeID?: Nullable<string>): Nullable<boolean> | Promise<Nullable<boolean>>;
+    addStep(addStepInput?: Nullable<AddStepInput>): Nullable<StepDTO> | Promise<Nullable<StepDTO>>;
+    updateStep(updateStepInput?: Nullable<UpdateStepInput>): Nullable<StepDTO> | Promise<Nullable<StepDTO>>;
+    removeStep(stepID: string, recipeID?: Nullable<string>): Nullable<boolean> | Promise<Nullable<boolean>>;
 }
 
 type Nullable<T> = T | null;
