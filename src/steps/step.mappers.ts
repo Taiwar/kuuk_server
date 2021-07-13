@@ -7,7 +7,7 @@ export default class StepMappers {
       id: stepBE._id,
       name: stepBE.name,
       description: stepBE.description,
-      image: stepBE.image,
+      picture: stepBE.picture,
     };
   }
 }

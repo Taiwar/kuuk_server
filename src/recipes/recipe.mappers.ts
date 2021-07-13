@@ -6,7 +6,8 @@ export default class RecipeMappers {
     return {
       id: recipeBE._id,
       name: recipeBE.name,
-      ingredients: recipeBE.ingredients,
+      tags: recipeBE.tags,
+      pictures: recipeBE.pictures,
     };
   }
 }

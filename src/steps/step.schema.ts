@@ -14,7 +14,7 @@ export class StepBE extends Document {
   description: string;
 
   @Prop()
-  image: string;
+  picture: string;
 }
 
 export const StepMongoSchema = SchemaFactory.createForClass(StepBE);

@@ -2,7 +2,7 @@ type StepDTO {
   id: String!
   name: String!
   description: String
-  image: String
+  picture: String
 }
 
 type IngredientDTO {
@@ -18,6 +18,7 @@ type RecipeDTO {
   ingredients: [IngredientDTO]
   steps: [StepDTO]
   tags: [String]
+  pictures: [String]
 }
 
 input CreateRecipeInput {
@@ -25,12 +26,14 @@ input CreateRecipeInput {
   ingredientIDs: [String]
   stepIDs: [String]
   tags: [String]
+  pictures: [String]
 }
 
 input UpdateRecipeInput {
   id: String!
   name: String
   tags: [String]
+  pictures: [String]
 }
 
 input AddIngredientInput {
@@ -51,14 +54,14 @@ input AddStepInput {
   recipeID: String!
   name: String!
   description: String
-  image: String
+  picture: String
 }
 
 input UpdateStepInput {
   id: String!
   name: String
   description: String
-  image: String
+  picture: String
 }
 
 type Query {

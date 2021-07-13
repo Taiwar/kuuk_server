@@ -8,6 +8,9 @@ export class RecipeBE extends Document {
 
   @Prop({ type: [String], default: [] })
   tags: string[];
+
+  @Prop([String])
+  pictures: string[];
 }
 
 export const RecipeMongoSchema = SchemaFactory.createForClass(RecipeBE);
