@@ -1,6 +1,7 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import slug from 'slug';
 import {
   AddIngredientInput,
   AddStepInput,
@@ -33,7 +34,22 @@ export class RecipesService {
   public async create(
     createRecipeInput: CreateRecipeInput,
   ): Promise<RecipeDTO> {
-    const newRecipeBE = await new this.recipeModel(createRecipeInput);
+    const generatedSlug = slug(createRecipeInput.name);
+    const newRecipeBE = await new this.recipeModel({
+      name: createRecipeInput.name,
+      slug: createRecipeInput.slug ?? generatedSlug,
+      author: createRecipeInput.author,
+      description: createRecipeInput.description,
+      prepTimeMin: createRecipeInput.prepTimeMin,
+      cookTimeMin: createRecipeInput.cookTimeMin,
+      totalTimeMin: createRecipeInput.totalTimeMin,
+      notes: createRecipeInput.notes,
+      rating: createRecipeInput.rating,
+      sourceLinks: createRecipeInput.sourceLinks,
+      servings: createRecipeInput.servings,
+      tags: createRecipeInput.tags,
+      pictures: createRecipeInput.pictures,
+    });
     await newRecipeBE.save();
 
     return RecipeMappers.BEtoDTO(newRecipeBE);
