@@ -15,7 +15,13 @@ type IngredientDTO {
 type RecipeDTO {
   id: String!
   name: String!
-  slug: String
+  slug: String!
+  author: String
+  prepTime: Int
+  cookTime: Int
+  totalTime: Int
+  servings: Int!
+  rating: Int
   description: String
   notes: [String]
   sourceLinks: [String]
@@ -28,19 +34,29 @@ type RecipeDTO {
 input CreateRecipeInput {
   name: String!
   slug: String
+  author: String
+  prepTime: Int
+  cookTime: Int
+  totalTime: Int
+  servings: Int!
+  rating: Int
   description: String
   notes: [String]
   sourceLinks: [String]
   tags: [String]
   pictures: [String]
-  ingredientIDs: [String]
-  stepIDs: [String]
 }
 
 input UpdateRecipeInput {
   id: String!
   name: String
   slug: String
+  author: String
+  prepTime: Int
+  cookTime: Int
+  totalTime: Int
+  servings: Int
+  rating: Int
   description: String
   notes: [String]
   sourceLinks: [String]

@@ -9,7 +9,25 @@ export class RecipeBE extends Document {
   @Prop({ required: true, unique: true })
   slug: string;
 
-  @Prop([String])
+  @Prop({ unique: true })
+  author: string;
+
+  @Prop()
+  totalTime: number;
+
+  @Prop()
+  prepTime: number;
+
+  @Prop()
+  cookTime: number;
+
+  @Prop({ required: true })
+  servings: number;
+
+  @Prop()
+  rating: number;
+
+  @Prop({ type: [String], default: [] })
   sourceLinks: string[];
 
   @Prop()
@@ -18,10 +36,10 @@ export class RecipeBE extends Document {
   @Prop({ type: [String], default: [] })
   tags: string[];
 
-  @Prop([String])
+  @Prop({ type: [String], default: [] })
   pictures: string[];
 
-  @Prop([String])
+  @Prop({ type: [String], default: [] })
   notes: string[];
 }
 

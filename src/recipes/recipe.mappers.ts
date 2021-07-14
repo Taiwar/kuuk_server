@@ -6,6 +6,16 @@ export default class RecipeMappers {
     return {
       id: recipeBE._id,
       name: recipeBE.name,
+      slug: recipeBE.slug,
+      author: recipeBE.author,
+      description: recipeBE.description,
+      prepTime: recipeBE.prepTime,
+      cookTime: recipeBE.cookTime,
+      totalTime: recipeBE.totalTime,
+      notes: recipeBE.notes,
+      rating: recipeBE.rating,
+      sourceLinks: recipeBE.sourceLinks,
+      servings: recipeBE.servings,
       tags: recipeBE.tags,
       pictures: recipeBE.pictures,
     };

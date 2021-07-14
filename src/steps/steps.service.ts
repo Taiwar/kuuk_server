@@ -24,7 +24,7 @@ export class StepsService {
       recipeID: addStepInput.recipeID,
       name: addStepInput.name,
       description: addStepInput.description,
-      image: addStepInput.image,
+      picture: addStepInput.picture,
     });
     await newStepBE.save();
     return StepMappers.BEtoDTO(newStepBE);

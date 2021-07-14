@@ -33,9 +33,7 @@ export class RecipesService {
   public async create(
     createRecipeInput: CreateRecipeInput,
   ): Promise<RecipeDTO> {
-    const newRecipeBE = await new this.recipeModel({
-      name: createRecipeInput.name,
-    });
+    const newRecipeBE = await new this.recipeModel(createRecipeInput);
     await newRecipeBE.save();
 
     return RecipeMappers.BEtoDTO(newRecipeBE);

@@ -10,19 +10,29 @@
 export interface CreateRecipeInput {
     name: string;
     slug?: Nullable<string>;
+    author?: Nullable<string>;
+    prepTime?: Nullable<number>;
+    cookTime?: Nullable<number>;
+    totalTime?: Nullable<number>;
+    servings: number;
+    rating?: Nullable<number>;
     description?: Nullable<string>;
     notes?: Nullable<Nullable<string>[]>;
     sourceLinks?: Nullable<Nullable<string>[]>;
     tags?: Nullable<Nullable<string>[]>;
     pictures?: Nullable<Nullable<string>[]>;
-    ingredientIDs?: Nullable<Nullable<string>[]>;
-    stepIDs?: Nullable<Nullable<string>[]>;
 }
 
 export interface UpdateRecipeInput {
     id: string;
     name?: Nullable<string>;
     slug?: Nullable<string>;
+    author?: Nullable<string>;
+    prepTime?: Nullable<number>;
+    cookTime?: Nullable<number>;
+    totalTime?: Nullable<number>;
+    servings?: Nullable<number>;
+    rating?: Nullable<number>;
     description?: Nullable<string>;
     notes?: Nullable<Nullable<string>[]>;
     sourceLinks?: Nullable<Nullable<string>[]>;
@@ -75,7 +85,13 @@ export interface IngredientDTO {
 export interface RecipeDTO {
     id: string;
     name: string;
-    slug?: Nullable<string>;
+    slug: string;
+    author?: Nullable<string>;
+    prepTime?: Nullable<number>;
+    cookTime?: Nullable<number>;
+    totalTime?: Nullable<number>;
+    servings: number;
+    rating?: Nullable<number>;
     description?: Nullable<string>;
     notes?: Nullable<Nullable<string>[]>;
     sourceLinks?: Nullable<Nullable<string>[]>;
