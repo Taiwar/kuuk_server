@@ -9,7 +9,7 @@ export class RecipeBE extends Document {
   @Prop({ required: true, unique: true })
   slug: string;
 
-  @Prop({ unique: true })
+  @Prop()
   author: string;
 
   @Prop()

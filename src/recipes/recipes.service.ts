@@ -1,7 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import slug from 'slug';
 import {
   AddIngredientInput,
   AddStepInput,
@@ -15,6 +14,7 @@ import { IngredientsService } from '../ingredients/ingredients.service';
 import { StepsService } from '../steps/steps.service';
 import RecipeMappers from './recipe.mappers';
 import { RecipeBE } from './recipe.schema';
+import slugify from 'slugify';
 
 @Injectable()
 export class RecipesService {
@@ -34,7 +34,7 @@ export class RecipesService {
   public async create(
     createRecipeInput: CreateRecipeInput,
   ): Promise<RecipeDTO> {
-    const generatedSlug = slug(createRecipeInput.name);
+    const generatedSlug = slugify(createRecipeInput.name);
     const newRecipeBE = await new this.recipeModel({
       name: createRecipeInput.name,
       slug: createRecipeInput.slug ?? generatedSlug,
