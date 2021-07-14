@@ -17,9 +17,9 @@ type RecipeDTO {
   name: String!
   slug: String!
   author: String
-  prepTime: Int
-  cookTime: Int
-  totalTime: Int
+  prepTimeMin: Int
+  cookTimeMin: Int
+  totalTimeMin: Int
   servings: Int!
   rating: Int
   description: String
@@ -35,9 +35,9 @@ input CreateRecipeInput {
   name: String!
   slug: String
   author: String
-  prepTime: Int
-  cookTime: Int
-  totalTime: Int
+  prepTimeMin: Int
+  cookTimeMin: Int
+  totalTimeMin: Int
   servings: Int!
   rating: Int
   description: String
@@ -52,9 +52,9 @@ input UpdateRecipeInput {
   name: String
   slug: String
   author: String
-  prepTime: Int
-  cookTime: Int
-  totalTime: Int
+  prepTimeMin: Int
+  cookTimeMin: Int
+  totalTimeMin: Int
   servings: Int
   rating: Int
   description: String

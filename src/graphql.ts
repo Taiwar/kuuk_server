@@ -11,9 +11,9 @@ export interface CreateRecipeInput {
     name: string;
     slug?: Nullable<string>;
     author?: Nullable<string>;
-    prepTime?: Nullable<number>;
-    cookTime?: Nullable<number>;
-    totalTime?: Nullable<number>;
+    prepTimeMin?: Nullable<number>;
+    cookTimeMin?: Nullable<number>;
+    totalTimeMin?: Nullable<number>;
     servings: number;
     rating?: Nullable<number>;
     description?: Nullable<string>;
@@ -28,9 +28,9 @@ export interface UpdateRecipeInput {
     name?: Nullable<string>;
     slug?: Nullable<string>;
     author?: Nullable<string>;
-    prepTime?: Nullable<number>;
-    cookTime?: Nullable<number>;
-    totalTime?: Nullable<number>;
+    prepTimeMin?: Nullable<number>;
+    cookTimeMin?: Nullable<number>;
+    totalTimeMin?: Nullable<number>;
     servings?: Nullable<number>;
     rating?: Nullable<number>;
     description?: Nullable<string>;
@@ -87,9 +87,9 @@ export interface RecipeDTO {
     name: string;
     slug: string;
     author?: Nullable<string>;
-    prepTime?: Nullable<number>;
-    cookTime?: Nullable<number>;
-    totalTime?: Nullable<number>;
+    prepTimeMin?: Nullable<number>;
+    cookTimeMin?: Nullable<number>;
+    totalTimeMin?: Nullable<number>;
     servings: number;
     rating?: Nullable<number>;
     description?: Nullable<string>;

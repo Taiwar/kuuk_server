@@ -13,13 +13,13 @@ export class RecipeBE extends Document {
   author: string;
 
   @Prop()
-  totalTime: number;
+  totalTimeMin: number;
 
   @Prop()
-  prepTime: number;
+  prepTimeMin: number;
 
   @Prop()
-  cookTime: number;
+  cookTimeMin: number;
 
   @Prop({ required: true })
   servings: number;
