@@ -1,7 +1,7 @@
-# Kuuk
+# Kuuk-Server
 <p align="center">
-    <a href="https://github.com/Taiwar/OpenComputers-Scripts/contributors">
-        <img src="https://img.shields.io/github/contributors/Taiwar/OpenComputers-Scripts" alt="Contributors"/>
+    <a href="https://github.com/Taiwar/kuuk_server/contributors">
+        <img src="https://img.shields.io/github/contributors/Taiwar/kuuk_server" alt="Contributors"/>
     </a>
 </p>
 Recipe management.
