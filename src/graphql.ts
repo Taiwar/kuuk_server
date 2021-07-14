@@ -93,10 +93,10 @@ export interface RecipeDTO {
     servings: number;
     rating?: Nullable<number>;
     description?: Nullable<string>;
-    notes?: Nullable<Nullable<string>[]>;
-    sourceLinks?: Nullable<Nullable<string>[]>;
-    tags?: Nullable<Nullable<string>[]>;
-    pictures?: Nullable<Nullable<string>[]>;
+    notes: Nullable<string>[];
+    sourceLinks: Nullable<string>[];
+    tags: Nullable<string>[];
+    pictures: Nullable<string>[];
     ingredients?: Nullable<Nullable<IngredientDTO>[]>;
     steps?: Nullable<Nullable<StepDTO>[]>;
 }
