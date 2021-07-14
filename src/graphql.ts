@@ -9,15 +9,25 @@
 /* eslint-disable */
 export interface CreateRecipeInput {
     name: string;
+    slug?: Nullable<string>;
+    description?: Nullable<string>;
+    notes?: Nullable<Nullable<string>[]>;
+    sourceLinks?: Nullable<Nullable<string>[]>;
+    tags?: Nullable<Nullable<string>[]>;
+    pictures?: Nullable<Nullable<string>[]>;
     ingredientIDs?: Nullable<Nullable<string>[]>;
     stepIDs?: Nullable<Nullable<string>[]>;
-    tags?: Nullable<Nullable<string>[]>;
 }
 
 export interface UpdateRecipeInput {
     id: string;
     name?: Nullable<string>;
+    slug?: Nullable<string>;
+    description?: Nullable<string>;
+    notes?: Nullable<Nullable<string>[]>;
+    sourceLinks?: Nullable<Nullable<string>[]>;
     tags?: Nullable<Nullable<string>[]>;
+    pictures?: Nullable<Nullable<string>[]>;
 }
 
 export interface AddIngredientInput {
@@ -38,21 +48,21 @@ export interface AddStepInput {
     recipeID: string;
     name: string;
     description?: Nullable<string>;
-    image?: Nullable<string>;
+    picture?: Nullable<string>;
 }
 
 export interface UpdateStepInput {
     id: string;
     name?: Nullable<string>;
     description?: Nullable<string>;
-    image?: Nullable<string>;
+    picture?: Nullable<string>;
 }
 
 export interface StepDTO {
     id: string;
     name: string;
     description?: Nullable<string>;
-    image?: Nullable<string>;
+    picture?: Nullable<string>;
 }
 
 export interface IngredientDTO {
@@ -65,9 +75,14 @@ export interface IngredientDTO {
 export interface RecipeDTO {
     id: string;
     name: string;
+    slug?: Nullable<string>;
+    description?: Nullable<string>;
+    notes?: Nullable<Nullable<string>[]>;
+    sourceLinks?: Nullable<Nullable<string>[]>;
+    tags?: Nullable<Nullable<string>[]>;
+    pictures?: Nullable<Nullable<string>[]>;
     ingredients?: Nullable<Nullable<IngredientDTO>[]>;
     steps?: Nullable<Nullable<StepDTO>[]>;
-    tags?: Nullable<Nullable<string>[]>;
 }
 
 export interface IQuery {

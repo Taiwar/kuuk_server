@@ -13,7 +13,8 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "format": "prettier --write src/",
-    "lint": "eslint --ext .ts src/"
+    "lint": "eslint --ext .ts src/",
+    "watch:typings": "ts-node generate-typings.ts"
   },
   "dependencies": {
     "@apollo/gateway": "^0.33.0",

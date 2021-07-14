@@ -15,23 +15,35 @@ type IngredientDTO {
 type RecipeDTO {
   id: String!
   name: String!
-  ingredients: [IngredientDTO]
-  steps: [StepDTO]
+  slug: String
+  description: String
+  notes: [String]
+  sourceLinks: [String]
   tags: [String]
   pictures: [String]
+  ingredients: [IngredientDTO]
+  steps: [StepDTO]
 }
 
 input CreateRecipeInput {
   name: String!
-  ingredientIDs: [String]
-  stepIDs: [String]
+  slug: String
+  description: String
+  notes: [String]
+  sourceLinks: [String]
   tags: [String]
   pictures: [String]
+  ingredientIDs: [String]
+  stepIDs: [String]
 }
 
 input UpdateRecipeInput {
   id: String!
   name: String
+  slug: String
+  description: String
+  notes: [String]
+  sourceLinks: [String]
   tags: [String]
   pictures: [String]
 }

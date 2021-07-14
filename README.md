@@ -6,6 +6,10 @@
 </p>
 Recipe management.
 
+## Project documentation
+
+![ER-Model](docs/ER.png)
+
 ## Getting Started
 
 Installing dependencies:
@@ -18,6 +22,12 @@ Running the dev server:
 
 ```bash
 npm run dev
+```
+
+Generate `graphql.ts` typing file from GraphQL files and watch for further changes:
+
+```bash
+npn run watch:typings
 ```
 
 ## Running in production
