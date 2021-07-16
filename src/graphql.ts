@@ -97,13 +97,14 @@ export interface RecipeDTO {
     sourceLinks: Nullable<string>[];
     tags: Nullable<string>[];
     pictures: Nullable<string>[];
-    ingredients?: Nullable<Nullable<IngredientDTO>[]>;
-    steps?: Nullable<Nullable<StepDTO>[]>;
+    ingredients?: Nullable<IngredientDTO[]>;
+    steps?: Nullable<StepDTO[]>;
 }
 
 export interface IQuery {
     recipes(): Nullable<Nullable<RecipeDTO>[]> | Promise<Nullable<Nullable<RecipeDTO>[]>>;
     recipe(id: string): Nullable<RecipeDTO> | Promise<Nullable<RecipeDTO>>;
+    recipeBySlug(slug: string): Nullable<RecipeDTO> | Promise<Nullable<RecipeDTO>>;
 }
 
 export interface IMutation {

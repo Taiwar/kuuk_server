@@ -44,6 +44,11 @@ export class RecipesResolver {
     return this.recipesService.findOneById(id);
   }
 
+  @Query()
+  async recipeBySlug(@Args('slug') slug: string): Promise<RecipeDTO> {
+    return this.recipesService.findOneBySlug(slug);
+  }
+
   @Mutation()
   async createRecipe(
     @Args('createRecipeInput') createRecipeInput: CreateRecipeInput,

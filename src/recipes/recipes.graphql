@@ -27,8 +27,8 @@ type RecipeDTO {
   sourceLinks: [String]!
   tags: [String]!
   pictures: [String]!
-  ingredients: [IngredientDTO]
-  steps: [StepDTO]
+  ingredients: [IngredientDTO!]
+  steps: [StepDTO!]
 }
 
 input CreateRecipeInput {
@@ -95,6 +95,7 @@ input UpdateStepInput {
 type Query {
   recipes: [RecipeDTO]
   recipe(id: String!): RecipeDTO
+  recipeBySlug(slug: String!): RecipeDTO
 }
 
 type Mutation {

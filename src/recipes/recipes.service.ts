@@ -31,6 +31,12 @@ export class RecipesService {
     return RecipeMappers.BEtoDTO(await this.recipeModel.findById(id));
   }
 
+  public async findOneBySlug(slug: string): Promise<RecipeDTO> {
+    return RecipeMappers.BEtoDTO(
+      await this.recipeModel.findOne({ slug: slug }),
+    );
+  }
+
   public async create(
     createRecipeInput: CreateRecipeInput,
   ): Promise<RecipeDTO> {
