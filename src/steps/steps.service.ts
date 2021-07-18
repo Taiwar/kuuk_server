@@ -34,6 +34,7 @@ export class StepsService {
     const stepBE = await this.stepModel.findByIdAndUpdate(
       updateStepInput.id,
       updateStepInput,
+      { new: true },
     );
 
     if (!stepBE) {

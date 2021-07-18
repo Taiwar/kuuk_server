@@ -67,6 +67,7 @@ export class RecipesService {
     const recipeBE = await this.recipeModel.findByIdAndUpdate(
       updateRecipeInput.id,
       updateRecipeInput,
+      { new: true },
     );
 
     if (!recipeBE) {
@@ -82,7 +83,6 @@ export class RecipesService {
 
   async getAll(): Promise<RecipeDTO[]> {
     const recipeBEs = await this.recipeModel.find();
-    this.logger.log('recipes', recipeBEs);
     return recipeBEs.map((r) => RecipeMappers.BEtoDTO(r));
   }
 

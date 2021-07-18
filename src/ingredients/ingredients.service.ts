@@ -41,6 +41,7 @@ export class IngredientsService {
     const ingredientBE = await this.ingredientModel.findByIdAndUpdate(
       updateIngredientInput.id,
       updateIngredientInput,
+      { new: true },
     );
 
     if (!ingredientBE) {
