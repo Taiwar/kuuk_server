@@ -31,6 +31,11 @@ type RecipeDTO {
   steps: [StepDTO!]
 }
 
+input FilterRecipesInput {
+  name: String
+  tags: [String!]
+}
+
 input CreateRecipeInput {
   name: String!
   slug: String
@@ -93,7 +98,8 @@ input UpdateStepInput {
 }
 
 type Query {
-  recipes: [RecipeDTO]
+  recipes: [RecipeDTO]!
+  filterRecipes(filterRecipesInput: FilterRecipesInput): [RecipeDTO]!
   recipe(id: String!): RecipeDTO
   recipeBySlug(slug: String!): RecipeDTO
 }

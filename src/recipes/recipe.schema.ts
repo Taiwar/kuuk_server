@@ -3,10 +3,11 @@ import { Document } from 'mongoose';
 
 @Schema()
 export class RecipeBE extends Document {
+  // TODO: Add text index to this field automatically
   @Prop({ required: true, unique: true })
   name: string;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true, unique: true, index: true })
   slug: string;
 
   @Prop()

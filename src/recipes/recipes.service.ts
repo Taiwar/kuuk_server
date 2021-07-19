@@ -5,6 +5,7 @@ import {
   AddIngredientInput,
   AddStepInput,
   CreateRecipeInput,
+  FilterRecipesInput,
   IngredientDTO,
   RecipeDTO,
   StepDTO,
@@ -37,6 +38,34 @@ export class RecipesService {
     );
   }
 
+  public async filter(
+    filterRecipesInput: FilterRecipesInput,
+  ): Promise<RecipeDTO[]> {
+    const shouldApplyFilters = !!filterRecipesInput;
+    let query = {};
+
+    if (!shouldApplyFilters) {
+      return this.getAll();
+    }
+
+    this.logger.log('filtering for', JSON.stringify(filterRecipesInput));
+
+    const shouldApplyNameFilter = filterRecipesInput.name !== null;
+    const shouldApplyTagsFilter = filterRecipesInput.tags;
+
+    if (shouldApplyNameFilter) {
+      query = { ...query, $text: { $search: filterRecipesInput.name } };
+    }
+
+    if (shouldApplyTagsFilter) {
+      query = { ...query, tags: { $in: filterRecipesInput.tags } };
+    }
+
+    const recipeBEs = await this.recipeModel.find(query);
+    this.logger.log('Filter result', recipeBEs);
+    return recipeBEs.map((r) => RecipeMappers.BEtoDTO(r));
+  }
+
   public async create(
     createRecipeInput: CreateRecipeInput,
   ): Promise<RecipeDTO> {
@@ -61,6 +90,7 @@ export class RecipesService {
     return RecipeMappers.BEtoDTO(newRecipeBE);
   }
 
+  // TODO: Validate input data so null updates on non-nullable properties is not possible
   public async update(
     updateRecipeInput: UpdateRecipeInput,
   ): Promise<RecipeDTO> {

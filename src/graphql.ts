@@ -7,6 +7,11 @@
 
 /* tslint:disable */
 /* eslint-disable */
+export interface FilterRecipesInput {
+    name?: Nullable<string>;
+    tags?: Nullable<string[]>;
+}
+
 export interface CreateRecipeInput {
     name: string;
     slug?: Nullable<string>;
@@ -102,7 +107,8 @@ export interface RecipeDTO {
 }
 
 export interface IQuery {
-    recipes(): Nullable<Nullable<RecipeDTO>[]> | Promise<Nullable<Nullable<RecipeDTO>[]>>;
+    recipes(): Nullable<RecipeDTO>[] | Promise<Nullable<RecipeDTO>[]>;
+    filterRecipes(filterRecipesInput?: Nullable<FilterRecipesInput>): Nullable<RecipeDTO>[] | Promise<Nullable<RecipeDTO>[]>;
     recipe(id: string): Nullable<RecipeDTO> | Promise<Nullable<RecipeDTO>>;
     recipeBySlug(slug: string): Nullable<RecipeDTO> | Promise<Nullable<RecipeDTO>>;
 }

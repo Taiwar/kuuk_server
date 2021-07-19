@@ -10,6 +10,7 @@ import {
   AddIngredientInput,
   AddStepInput,
   CreateRecipeInput,
+  FilterRecipesInput,
   IngredientDTO,
   RecipeDTO,
   StepDTO,
@@ -37,6 +38,13 @@ export class RecipesResolver {
   @Query()
   async recipes(): Promise<RecipeDTO[]> {
     return this.recipesService.getAll();
+  }
+
+  @Query()
+  async filterRecipes(
+    @Args('filterRecipesInput') filterRecipesInput: FilterRecipesInput,
+  ): Promise<RecipeDTO[]> {
+    return this.recipesService.filter(filterRecipesInput);
   }
 
   @Query()
