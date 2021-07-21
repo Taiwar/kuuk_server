@@ -1,9 +1,10 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-@Schema()
+@Schema({
+  autoIndex: true,
+})
 export class RecipeBE extends Document {
-  // TODO: Add text index to this field automatically
   @Prop({ required: true, unique: true })
   name: string;
 
@@ -45,3 +46,5 @@ export class RecipeBE extends Document {
 }
 
 export const RecipeMongoSchema = SchemaFactory.createForClass(RecipeBE);
+
+RecipeMongoSchema.index({ name: 'text' });

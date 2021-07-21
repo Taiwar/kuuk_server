@@ -1,9 +1,16 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongoSchema } from 'mongoose';
 
-@Schema()
+@Schema({
+  autoIndex: true,
+})
 export class IngredientBE extends Document {
-  @Prop({ type: MongoSchema.Types.ObjectId, ref: 'Recipe', required: true })
+  @Prop({
+    type: MongoSchema.Types.ObjectId,
+    ref: 'Recipe',
+    required: true,
+    index: true,
+  })
   recipeID: string;
 
   @Prop({ required: true })
@@ -17,3 +24,5 @@ export class IngredientBE extends Document {
 }
 
 export const IngredientMongoSchema = SchemaFactory.createForClass(IngredientBE);
+
+IngredientMongoSchema.index({ name: 'text' });
