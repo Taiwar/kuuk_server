@@ -1,11 +1,7 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import {
-  AddStepInput,
-  StepDTO,
-  UpdateStepInput,
-} from '../graphql';
+import { AddStepInput, StepDTO, UpdateStepInput } from '../graphql';
 import StepMappers from './step.mappers';
 import { StepBE } from './step.schema';
 
@@ -22,7 +18,6 @@ export class StepsService {
     return StepMappers.BEtoDTO(await this.stepModel.findById(id));
   }
 
-  // TODO: Check how nullables should be handled
   public async create(addStepInput: AddStepInput): Promise<StepDTO> {
     const newStepBE = await new this.stepModel({
       recipeID: addStepInput.recipeID,
