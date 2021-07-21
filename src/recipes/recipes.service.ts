@@ -90,14 +90,29 @@ export class RecipesService {
     return RecipeMappers.BEtoDTO(newRecipeBE);
   }
 
-  // TODO: Validate input data so null updates on non-nullable properties is not possible
   public async update(
     updateRecipeInput: UpdateRecipeInput,
   ): Promise<RecipeDTO> {
+    const update: UpdateRecipeInput = {
+      id: updateRecipeInput.id,
+      name: updateRecipeInput.name ?? undefined,
+      slug: updateRecipeInput.slug ?? undefined,
+      author: updateRecipeInput.author ?? undefined,
+      prepTimeMin: updateRecipeInput.prepTimeMin ?? undefined,
+      cookTimeMin: updateRecipeInput.cookTimeMin ?? undefined,
+      totalTimeMin: updateRecipeInput.totalTimeMin ?? undefined,
+      servings: updateRecipeInput.servings ?? undefined,
+      rating: updateRecipeInput.rating ?? undefined,
+      description: updateRecipeInput.description ?? undefined,
+      notes: updateRecipeInput.notes ?? undefined,
+      sourceLinks: updateRecipeInput.sourceLinks ?? undefined,
+      tags: updateRecipeInput.tags ?? undefined,
+      pictures: updateRecipeInput.pictures ?? undefined,
+    };
     const recipeBE = await this.recipeModel.findByIdAndUpdate(
-      updateRecipeInput.id,
-      updateRecipeInput,
-      { new: true },
+      update.id,
+      update,
+      { new: true, omitUndefined: true },
     );
 
     if (!recipeBE) {

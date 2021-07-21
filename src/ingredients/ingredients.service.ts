@@ -38,10 +38,16 @@ export class IngredientsService {
   public async update(
     updateIngredientInput: UpdateIngredientInput,
   ): Promise<IngredientDTO> {
+    const update: UpdateIngredientInput = {
+      id: updateIngredientInput.id,
+      name: updateIngredientInput.name ?? undefined,
+      amount: updateIngredientInput.amount ?? undefined,
+      unit: updateIngredientInput.unit ?? undefined,
+    };
     const ingredientBE = await this.ingredientModel.findByIdAndUpdate(
-      updateIngredientInput.id,
-      updateIngredientInput,
-      { new: true },
+      update.id,
+      update,
+      { new: true, omitUndefined: true },
     );
 
     if (!ingredientBE) {

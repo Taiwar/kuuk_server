@@ -1,7 +1,11 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { AddStepInput, StepDTO, UpdateStepInput } from '../graphql';
+import {
+  AddStepInput,
+  StepDTO,
+  UpdateStepInput,
+} from '../graphql';
 import StepMappers from './step.mappers';
 import { StepBE } from './step.schema';
 
@@ -31,11 +35,16 @@ export class StepsService {
   }
 
   public async update(updateStepInput: UpdateStepInput): Promise<StepDTO> {
-    const stepBE = await this.stepModel.findByIdAndUpdate(
-      updateStepInput.id,
-      updateStepInput,
-      { new: true },
-    );
+    const update: UpdateStepInput = {
+      id: updateStepInput.id,
+      name: updateStepInput.name ?? undefined,
+      description: updateStepInput.description ?? undefined,
+      picture: updateStepInput.picture ?? undefined,
+    };
+    const stepBE = await this.stepModel.findByIdAndUpdate(update.id, update, {
+      new: true,
+      omitUndefined: true,
+    });
 
     if (!stepBE) {
       throw new NotFoundException(`Step #${updateStepInput.id} not found`);
