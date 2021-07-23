@@ -106,6 +106,11 @@ export interface RecipeDTO {
     steps?: Nullable<StepDTO[]>;
 }
 
+export interface DeletionResponse {
+    id: string;
+    success: boolean;
+}
+
 export interface IQuery {
     recipes(): Nullable<RecipeDTO>[] | Promise<Nullable<RecipeDTO>[]>;
     filterRecipes(filterRecipesInput?: Nullable<FilterRecipesInput>): Nullable<RecipeDTO>[] | Promise<Nullable<RecipeDTO>[]>;
@@ -116,13 +121,13 @@ export interface IQuery {
 export interface IMutation {
     createRecipe(createRecipeInput?: Nullable<CreateRecipeInput>): Nullable<RecipeDTO> | Promise<Nullable<RecipeDTO>>;
     updateRecipe(updateRecipeInput?: Nullable<UpdateRecipeInput>): Nullable<RecipeDTO> | Promise<Nullable<RecipeDTO>>;
-    deleteRecipe(id: string): Nullable<boolean> | Promise<Nullable<boolean>>;
+    deleteRecipe(id: string): Nullable<DeletionResponse> | Promise<Nullable<DeletionResponse>>;
     addIngredient(addIngredientInput?: Nullable<AddIngredientInput>): Nullable<IngredientDTO> | Promise<Nullable<IngredientDTO>>;
     updateIngredient(updateIngredientInput?: Nullable<UpdateIngredientInput>): Nullable<IngredientDTO> | Promise<Nullable<IngredientDTO>>;
-    removeIngredient(ingredientID: string, recipeID?: Nullable<string>): Nullable<boolean> | Promise<Nullable<boolean>>;
+    removeIngredient(ingredientID: string, recipeID?: Nullable<string>): Nullable<DeletionResponse> | Promise<Nullable<DeletionResponse>>;
     addStep(addStepInput?: Nullable<AddStepInput>): Nullable<StepDTO> | Promise<Nullable<StepDTO>>;
     updateStep(updateStepInput?: Nullable<UpdateStepInput>): Nullable<StepDTO> | Promise<Nullable<StepDTO>>;
-    removeStep(stepID: string, recipeID?: Nullable<string>): Nullable<boolean> | Promise<Nullable<boolean>>;
+    removeStep(stepID: string, recipeID?: Nullable<string>): Nullable<DeletionResponse> | Promise<Nullable<DeletionResponse>>;
 }
 
 type Nullable<T> = T | null;

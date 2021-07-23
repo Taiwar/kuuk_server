@@ -5,6 +5,7 @@ import {
   AddIngredientInput,
   AddStepInput,
   CreateRecipeInput,
+  DeletionResponse,
   FilterRecipesInput,
   IngredientDTO,
   RecipeDTO,
@@ -122,8 +123,11 @@ export class RecipesService {
     return RecipeMappers.BEtoDTO(recipeBE);
   }
 
-  public async delete(id: string): Promise<boolean> {
-    return !!(await this.recipeModel.findByIdAndDelete(id));
+  public async delete(id: string): Promise<DeletionResponse> {
+    return {
+      id,
+      success: !!(await this.recipeModel.findByIdAndDelete(id)),
+    };
   }
 
   async getAll(): Promise<RecipeDTO[]> {
@@ -148,14 +152,17 @@ export class RecipesService {
   public async removeIngredient(
     ingredientId: string,
     recipeId: string,
-  ): Promise<boolean> {
+  ): Promise<DeletionResponse> {
     const removeResult = await this.recipeModel.findByIdAndUpdate(recipeId, {
       $pull: {
         ingredients: ingredientId,
       },
     });
     const deleteResult = await this.ingredientsService.delete(ingredientId);
-    return deleteResult !== null && removeResult !== null;
+    return {
+      id: ingredientId,
+      success: deleteResult !== null && removeResult !== null,
+    };
   }
 
   public async addStep(addStepInput: AddStepInput): Promise<StepDTO> {
@@ -168,13 +175,19 @@ export class RecipesService {
     return newStepDTO;
   }
 
-  public async removeStep(stepId: string, recipeId: string): Promise<boolean> {
+  public async removeStep(
+    stepId: string,
+    recipeId: string,
+  ): Promise<DeletionResponse> {
     const removeResult = await this.recipeModel.findByIdAndUpdate(recipeId, {
       $pull: {
         steps: stepId,
       },
     });
     const deleteResult = await this.stepsService.delete(stepId);
-    return deleteResult !== null && removeResult !== null;
+    return {
+      id: stepId,
+      success: deleteResult !== null && removeResult !== null,
+    };
   }
 }

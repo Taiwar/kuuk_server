@@ -97,6 +97,11 @@ input UpdateStepInput {
   picture: String
 }
 
+type DeletionResponse {
+  id: String!
+  success: Boolean!
+}
+
 type Query {
   recipes: [RecipeDTO]!
   filterRecipes(filterRecipesInput: FilterRecipesInput): [RecipeDTO]!
@@ -107,11 +112,11 @@ type Query {
 type Mutation {
   createRecipe(createRecipeInput: CreateRecipeInput): RecipeDTO
   updateRecipe(updateRecipeInput: UpdateRecipeInput): RecipeDTO
-  deleteRecipe(id: String!): Boolean
+  deleteRecipe(id: String!): DeletionResponse
   addIngredient(addIngredientInput: AddIngredientInput): IngredientDTO
   updateIngredient(updateIngredientInput: UpdateIngredientInput): IngredientDTO
-  removeIngredient(ingredientID: String!, recipeID: String): Boolean
+  removeIngredient(ingredientID: String!, recipeID: String): DeletionResponse
   addStep(addStepInput: AddStepInput): StepDTO
   updateStep(updateStepInput: UpdateStepInput): StepDTO
-  removeStep(stepID: String!, recipeID: String): Boolean
+  removeStep(stepID: String!, recipeID: String): DeletionResponse
 }

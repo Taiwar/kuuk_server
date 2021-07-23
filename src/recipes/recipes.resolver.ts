@@ -10,12 +10,14 @@ import {
   AddIngredientInput,
   AddStepInput,
   CreateRecipeInput,
+  DeletionResponse,
   FilterRecipesInput,
   IngredientDTO,
   RecipeDTO,
   StepDTO,
   UpdateIngredientInput,
   UpdateRecipeInput,
+  UpdateStepInput,
 } from '../graphql';
 import { IngredientsService } from '../ingredients/ingredients.service';
 import { StepsService } from '../steps/steps.service';
@@ -72,7 +74,7 @@ export class RecipesResolver {
   }
 
   @Mutation()
-  async deleteRecipe(@Args('id') id: string): Promise<boolean> {
+  async deleteRecipe(@Args('id') id: string): Promise<DeletionResponse> {
     return this.recipesService.delete(id);
   }
 
@@ -98,9 +100,9 @@ export class RecipesResolver {
 
   @Mutation()
   async removeIngredient(
-    @Args('ingredientId') ingredientId: string,
-    @Args('recipeId') recipeId: string,
-  ): Promise<boolean> {
+    @Args('ingredientID') ingredientId: string,
+    @Args('recipeID') recipeId: string,
+  ): Promise<DeletionResponse> {
     return this.recipesService.removeIngredient(ingredientId, recipeId);
   }
 
@@ -113,16 +115,16 @@ export class RecipesResolver {
 
   @Mutation()
   async updateStep(
-    @Args('updateIngredientInput') updateIngredientInput: UpdateIngredientInput,
+    @Args('updateStepInput') updateStepInput: UpdateStepInput,
   ): Promise<StepDTO> {
-    return this.stepService.update(updateIngredientInput);
+    return this.stepService.update(updateStepInput);
   }
 
   @Mutation()
   async removeStep(
-    @Args('stepId') stepId: string,
-    @Args('recipeId') recipeId: string,
-  ): Promise<boolean> {
+    @Args('stepID') stepId: string,
+    @Args('recipeID') recipeId: string,
+  ): Promise<DeletionResponse> {
     return this.recipesService.removeStep(stepId, recipeId);
   }
 }
