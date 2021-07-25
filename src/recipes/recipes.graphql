@@ -23,10 +23,10 @@ type RecipeDTO {
   servings: Int!
   rating: Int
   description: String
-  notes: [String]!
-  sourceLinks: [String]!
-  tags: [String]!
-  pictures: [String]!
+  notes: [String!]!
+  sourceLinks: [String!]!
+  tags: [String!]!
+  pictures: [String!]!
   ingredients: [IngredientDTO!]
   steps: [StepDTO!]
 }
@@ -46,10 +46,10 @@ input CreateRecipeInput {
   servings: Int!
   rating: Int
   description: String
-  notes: [String]
-  sourceLinks: [String]
-  tags: [String]
-  pictures: [String]
+  notes: [String!]
+  sourceLinks: [String!]
+  tags: [String!]
+  pictures: [String!]
 }
 
 input UpdateRecipeInput {
@@ -63,10 +63,10 @@ input UpdateRecipeInput {
   servings: Int
   rating: Int
   description: String
-  notes: [String]
-  sourceLinks: [String]
-  tags: [String]
-  pictures: [String]
+  notes: [String!]
+  sourceLinks: [String!]
+  tags: [String!]
+  pictures: [String!]
 }
 
 input AddIngredientInput {
