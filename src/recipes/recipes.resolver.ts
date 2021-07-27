@@ -8,18 +8,22 @@ import {
 } from '@nestjs/graphql';
 import {
   AddIngredientInput,
+  AddNoteInput,
   AddStepInput,
   CreateRecipeInput,
   DeletionResponse,
   FilterRecipesInput,
   IngredientDTO,
+  NoteDTO,
   RecipeDTO,
   StepDTO,
   UpdateIngredientInput,
+  UpdateNoteInput,
   UpdateRecipeInput,
   UpdateStepInput,
 } from '../graphql';
 import { IngredientsService } from '../ingredients/ingredients.service';
+import { NotesService } from '../notes/notes.service';
 import { StepsService } from '../steps/steps.service';
 import { RecipesService } from './recipes.service';
 
@@ -29,12 +33,25 @@ export class RecipesResolver {
     private recipesService: RecipesService,
     private ingredientsService: IngredientsService,
     private stepService: StepsService,
+    private notesService: NotesService,
   ) {}
 
   @ResolveField()
   async steps(@Parent() recipe): Promise<StepDTO[]> {
     const { id } = recipe;
     return this.stepService.findAllByRecipeID(id);
+  }
+
+  @ResolveField()
+  async ingredients(@Parent() recipe): Promise<IngredientDTO[]> {
+    const { id } = recipe;
+    return this.ingredientsService.findAllByRecipeID(id);
+  }
+
+  @ResolveField()
+  async notes(@Parent() recipe): Promise<NoteDTO[]> {
+    const { id } = recipe;
+    return this.notesService.findAllByRecipeID(id);
   }
 
   @Query()
@@ -76,12 +93,6 @@ export class RecipesResolver {
   @Mutation()
   async deleteRecipe(@Args('id') id: string): Promise<DeletionResponse> {
     return this.recipesService.delete(id);
-  }
-
-  @ResolveField()
-  async ingredients(@Parent() recipe): Promise<IngredientDTO[]> {
-    const { id } = recipe;
-    return this.ingredientsService.findAllByRecipeID(id);
   }
 
   @Mutation()
@@ -126,5 +137,27 @@ export class RecipesResolver {
     @Args('recipeID') recipeId: string,
   ): Promise<DeletionResponse> {
     return this.recipesService.removeStep(stepId, recipeId);
+  }
+
+  @Mutation()
+  async addNote(
+    @Args('addNoteInput') addNoteInput: AddNoteInput,
+  ): Promise<NoteDTO> {
+    return this.recipesService.addNote(addNoteInput);
+  }
+
+  @Mutation()
+  async updateNote(
+    @Args('updateNoteInput') updateNoteInput: UpdateNoteInput,
+  ): Promise<NoteDTO> {
+    return this.notesService.update(updateNoteInput);
+  }
+
+  @Mutation()
+  async removeNote(
+    @Args('noteID') noteId: string,
+    @Args('recipeID') recipeId: string,
+  ): Promise<DeletionResponse> {
+    return this.recipesService.removeNote(noteId, recipeId);
   }
 }

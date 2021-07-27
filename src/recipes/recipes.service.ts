@@ -3,16 +3,19 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import {
   AddIngredientInput,
+  AddNoteInput,
   AddStepInput,
   CreateRecipeInput,
   DeletionResponse,
   FilterRecipesInput,
   IngredientDTO,
+  NoteDTO,
   RecipeDTO,
   StepDTO,
   UpdateRecipeInput,
 } from '../graphql';
 import { IngredientsService } from '../ingredients/ingredients.service';
+import { NotesService } from '../notes/notes.service';
 import { StepsService } from '../steps/steps.service';
 import RecipeMappers from './recipe.mappers';
 import { RecipeBE } from './recipe.schema';
@@ -27,6 +30,7 @@ export class RecipesService {
     private readonly recipeModel: Model<RecipeBE>,
     private readonly ingredientsService: IngredientsService,
     private readonly stepsService: StepsService,
+    private readonly notesService: NotesService,
   ) {}
 
   public async findOneById(id: string): Promise<RecipeDTO> {
@@ -187,6 +191,32 @@ export class RecipesService {
     const deleteResult = await this.stepsService.delete(stepId);
     return {
       id: stepId,
+      success: deleteResult !== null && removeResult !== null,
+    };
+  }
+
+  public async addNote(addNoteInput: AddNoteInput): Promise<NoteDTO> {
+    const newNoteDTO = await this.notesService.create(addNoteInput);
+    this.recipeModel.findByIdAndUpdate(addNoteInput.recipeID, {
+      $addToSet: {
+        notes: newNoteDTO.id,
+      },
+    });
+    return newNoteDTO;
+  }
+
+  public async removeNote(
+    noteId: string,
+    recipeId: string,
+  ): Promise<DeletionResponse> {
+    const removeResult = await this.recipeModel.findByIdAndUpdate(recipeId, {
+      $pull: {
+        notes: noteId,
+      },
+    });
+    const deleteResult = await this.notesService.delete(noteId);
+    return {
+      id: noteId,
       success: deleteResult !== null && removeResult !== null,
     };
   }

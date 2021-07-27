@@ -73,11 +73,29 @@ export interface UpdateStepInput {
     picture?: Nullable<string>;
 }
 
+export interface AddNoteInput {
+    recipeID: string;
+    name: string;
+    description?: Nullable<string>;
+}
+
+export interface UpdateNoteInput {
+    id: string;
+    name?: Nullable<string>;
+    description?: Nullable<string>;
+}
+
 export interface StepDTO {
     id: string;
     name: string;
     description?: Nullable<string>;
     picture?: Nullable<string>;
+}
+
+export interface NoteDTO {
+    id: string;
+    name: string;
+    description?: Nullable<string>;
 }
 
 export interface IngredientDTO {
@@ -98,12 +116,12 @@ export interface RecipeDTO {
     servings: number;
     rating?: Nullable<number>;
     description?: Nullable<string>;
-    notes: string[];
     sourceLinks: string[];
     tags: string[];
     pictures: string[];
     ingredients?: Nullable<IngredientDTO[]>;
     steps?: Nullable<StepDTO[]>;
+    notes?: Nullable<NoteDTO[]>;
 }
 
 export interface DeletionResponse {
@@ -128,6 +146,9 @@ export interface IMutation {
     addStep(addStepInput?: Nullable<AddStepInput>): Nullable<StepDTO> | Promise<Nullable<StepDTO>>;
     updateStep(updateStepInput?: Nullable<UpdateStepInput>): Nullable<StepDTO> | Promise<Nullable<StepDTO>>;
     removeStep(stepID: string, recipeID?: Nullable<string>): Nullable<DeletionResponse> | Promise<Nullable<DeletionResponse>>;
+    addNote(addNoteInput?: Nullable<AddNoteInput>): Nullable<NoteDTO> | Promise<Nullable<NoteDTO>>;
+    updateNote(updateNoteInput?: Nullable<UpdateNoteInput>): Nullable<NoteDTO> | Promise<Nullable<NoteDTO>>;
+    removeNote(noteID: string, recipeID?: Nullable<string>): Nullable<DeletionResponse> | Promise<Nullable<DeletionResponse>>;
 }
 
 type Nullable<T> = T | null;

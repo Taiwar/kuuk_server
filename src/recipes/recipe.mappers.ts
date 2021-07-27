@@ -12,7 +12,6 @@ export default class RecipeMappers {
       prepTimeMin: recipeBE.prepTimeMin,
       cookTimeMin: recipeBE.cookTimeMin,
       totalTimeMin: recipeBE.totalTimeMin,
-      notes: recipeBE.notes,
       rating: recipeBE.rating,
       sourceLinks: recipeBE.sourceLinks,
       servings: recipeBE.servings,

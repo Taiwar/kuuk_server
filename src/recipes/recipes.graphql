@@ -5,6 +5,12 @@ type StepDTO {
   picture: String
 }
 
+type NoteDTO {
+  id: String!
+  name: String!
+  description: String
+}
+
 type IngredientDTO {
   id: String!
   name: String!
@@ -23,12 +29,12 @@ type RecipeDTO {
   servings: Int!
   rating: Int
   description: String
-  notes: [String!]!
   sourceLinks: [String!]!
   tags: [String!]!
   pictures: [String!]!
   ingredients: [IngredientDTO!]
   steps: [StepDTO!]
+  notes: [NoteDTO!]
 }
 
 input FilterRecipesInput {
@@ -97,6 +103,18 @@ input UpdateStepInput {
   picture: String
 }
 
+input AddNoteInput {
+  recipeID: String!
+  name: String!
+  description: String
+}
+
+input UpdateNoteInput {
+  id: String!
+  name: String
+  description: String
+}
+
 type DeletionResponse {
   id: String!
   success: Boolean!
@@ -119,4 +137,7 @@ type Mutation {
   addStep(addStepInput: AddStepInput): StepDTO
   updateStep(updateStepInput: UpdateStepInput): StepDTO
   removeStep(stepID: String!, recipeID: String): DeletionResponse
+  addNote(addNoteInput: AddNoteInput): NoteDTO
+  updateNote(updateNoteInput: UpdateNoteInput): NoteDTO
+  removeNote(noteID: String!, recipeID: String): DeletionResponse
 }

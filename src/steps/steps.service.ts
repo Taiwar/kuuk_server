@@ -7,7 +7,7 @@ import { StepBE } from './step.schema';
 
 @Injectable()
 export class StepsService {
-  private logger: Logger = new Logger('IngredientsService');
+  private logger: Logger = new Logger('StepsService');
 
   constructor(
     @InjectModel(StepBE.name)
