@@ -55,8 +55,11 @@ export class RecipesService {
 
     this.logger.log('filtering for', JSON.stringify(filterRecipesInput));
 
-    const shouldApplyNameFilter = filterRecipesInput.name !== null;
-    const shouldApplyTagsFilter = filterRecipesInput.tags;
+    const tags = filterRecipesInput.tags.filter((t) => t.length > 0);
+
+    const shouldApplyNameFilter =
+      filterRecipesInput.name !== null && filterRecipesInput.name.length > 0;
+    const shouldApplyTagsFilter = tags.length > 0;
 
     if (shouldApplyNameFilter) {
       query = { ...query, $text: { $search: filterRecipesInput.name } };
@@ -66,8 +69,9 @@ export class RecipesService {
       query = { ...query, tags: { $in: filterRecipesInput.tags } };
     }
 
+    this.logger.log('constructed query', query);
+
     const recipeBEs = await this.recipeModel.find(query);
-    this.logger.log('Filter result', recipeBEs);
     return recipeBEs.map((r) => RecipeMappers.BEtoDTO(r));
   }
 
