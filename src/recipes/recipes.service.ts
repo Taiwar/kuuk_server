@@ -66,7 +66,7 @@ export class RecipesService {
     }
 
     if (shouldApplyTagsFilter) {
-      query = { ...query, tags: { $in: filterRecipesInput.tags } };
+      query = { ...query, tags: { $all: filterRecipesInput.tags } };
     }
 
     this.logger.log('constructed query', query);
@@ -141,6 +141,10 @@ export class RecipesService {
   async getAll(): Promise<RecipeDTO[]> {
     const recipeBEs = await this.recipeModel.find();
     return recipeBEs.map((r) => RecipeMappers.BEtoDTO(r));
+  }
+
+  async getAllTags(): Promise<string[]> {
+    return this.recipeModel.distinct('tags');
   }
 
   public async addIngredient(

@@ -21,6 +21,12 @@ export class IngredientBE extends Document {
 
   @Prop({ required: true })
   unit: string;
+
+  @Prop({ required: true })
+  sortNr: number;
+
+  @Prop()
+  group: string;
 }
 
 export const IngredientMongoSchema = SchemaFactory.createForClass(IngredientBE);

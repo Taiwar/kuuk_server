@@ -8,6 +8,8 @@ export default class StepMappers {
       name: stepBE.name,
       description: stepBE.description,
       picture: stepBE.picture,
+      sortNr: stepBE.sortNr,
+      group: stepBE.group,
     };
   }
 }

@@ -24,6 +24,7 @@ export class StepsService {
       name: addStepInput.name,
       description: addStepInput.description,
       picture: addStepInput.picture,
+      group: addStepInput.group,
     });
     await newStepBE.save();
     return StepMappers.BEtoDTO(newStepBE);
@@ -35,6 +36,8 @@ export class StepsService {
       name: updateStepInput.name ?? undefined,
       description: updateStepInput.description ?? undefined,
       picture: updateStepInput.picture ?? undefined,
+      sortNr: updateStepInput.sortNr ?? undefined,
+      group: updateStepInput.group ?? undefined,
     };
     const stepBE = await this.stepModel.findByIdAndUpdate(update.id, update, {
       new: true,

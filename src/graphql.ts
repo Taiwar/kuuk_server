@@ -50,6 +50,7 @@ export interface AddIngredientInput {
     name: string;
     amount: number;
     unit: string;
+    group?: Nullable<string>;
 }
 
 export interface UpdateIngredientInput {
@@ -57,6 +58,8 @@ export interface UpdateIngredientInput {
     name?: Nullable<string>;
     amount?: Nullable<number>;
     unit?: Nullable<string>;
+    sortNr?: Nullable<number>;
+    group?: Nullable<string>;
 }
 
 export interface AddStepInput {
@@ -64,6 +67,7 @@ export interface AddStepInput {
     name: string;
     description?: Nullable<string>;
     picture?: Nullable<string>;
+    group?: Nullable<string>;
 }
 
 export interface UpdateStepInput {
@@ -71,31 +75,47 @@ export interface UpdateStepInput {
     name?: Nullable<string>;
     description?: Nullable<string>;
     picture?: Nullable<string>;
+    sortNr?: Nullable<number>;
+    group?: Nullable<string>;
 }
 
 export interface AddNoteInput {
     recipeID: string;
     name: string;
     description?: Nullable<string>;
+    group?: Nullable<string>;
 }
 
 export interface UpdateNoteInput {
     id: string;
     name?: Nullable<string>;
     description?: Nullable<string>;
+    sortNr?: Nullable<number>;
+    group?: Nullable<string>;
 }
 
-export interface StepDTO {
+export interface OrderedRecipeItem {
+    id: string;
+    name: string;
+    sortNr: number;
+    group?: Nullable<string>;
+}
+
+export interface StepDTO extends OrderedRecipeItem {
     id: string;
     name: string;
     description?: Nullable<string>;
     picture?: Nullable<string>;
+    sortNr: number;
+    group?: Nullable<string>;
 }
 
 export interface NoteDTO {
     id: string;
     name: string;
     description?: Nullable<string>;
+    sortNr: number;
+    group?: Nullable<string>;
 }
 
 export interface IngredientDTO {
@@ -103,6 +123,8 @@ export interface IngredientDTO {
     name: string;
     amount: number;
     unit: string;
+    sortNr: number;
+    group?: Nullable<string>;
 }
 
 export interface RecipeDTO {
@@ -130,7 +152,9 @@ export interface DeletionResponse {
 }
 
 export interface IQuery {
-    recipes(): Nullable<RecipeDTO>[] | Promise<Nullable<RecipeDTO>[]>;
+    recipes(): RecipeDTO[] | Promise<RecipeDTO[]>;
+    tags(): string[] | Promise<string[]>;
+    ingredientNames(): string[] | Promise<string[]>;
     filterRecipes(filterRecipesInput?: Nullable<FilterRecipesInput>): Nullable<RecipeDTO>[] | Promise<Nullable<RecipeDTO>[]>;
     recipe(id: string): Nullable<RecipeDTO> | Promise<Nullable<RecipeDTO>>;
     recipeBySlug(slug: string): Nullable<RecipeDTO> | Promise<Nullable<RecipeDTO>>;

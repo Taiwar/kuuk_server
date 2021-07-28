@@ -8,6 +8,8 @@ export default class IngredientMappers {
       name: ingredientBE.name,
       amount: ingredientBE.amount,
       unit: ingredientBE.unit,
+      sortNr: ingredientBE.sortNr,
+      group: ingredientBE.group,
     };
   }
 }

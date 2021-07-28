@@ -23,6 +23,7 @@ export class NotesService {
       recipeID: addNoteInput.recipeID,
       name: addNoteInput.name,
       description: addNoteInput.description,
+      group: addNoteInput.group,
     });
     await newNoteBE.save();
     return NoteMappers.BEtoDTO(newNoteBE);
@@ -33,6 +34,8 @@ export class NotesService {
       id: updateNoteInput.id,
       name: updateNoteInput.name ?? undefined,
       description: updateNoteInput.description ?? undefined,
+      sortNr: updateNoteInput.sortNr ?? undefined,
+      group: updateNoteInput.group ?? undefined,
     };
     const noteBE = await this.noteModel.findByIdAndUpdate(update.id, update, {
       new: true,

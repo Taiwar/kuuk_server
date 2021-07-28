@@ -76,6 +76,16 @@ export class RecipesResolver {
     return this.recipesService.findOneBySlug(slug);
   }
 
+  @Query()
+  async tags(): Promise<string[]> {
+    return this.recipesService.getAllTags();
+  }
+
+  @Query()
+  async ingredientNames(): Promise<string[]> {
+    return this.ingredientsService.getAllNames();
+  }
+
   @Mutation()
   async createRecipe(
     @Args('createRecipeInput') createRecipeInput: CreateRecipeInput,

@@ -7,6 +7,8 @@ export default class NoteMappers {
       id: noteBE._id,
       name: noteBE.name,
       description: noteBE.description,
+      sortNr: noteBE.sortNr,
+      group: noteBE.group,
     };
   }
 }

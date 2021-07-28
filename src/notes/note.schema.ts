@@ -11,6 +11,12 @@ export class NoteBE extends Document {
 
   @Prop()
   description: string;
+
+  @Prop({ required: true })
+  sortNr: number;
+
+  @Prop()
+  group: string;
 }
 
 export const NoteMongoSchema = SchemaFactory.createForClass(NoteBE);

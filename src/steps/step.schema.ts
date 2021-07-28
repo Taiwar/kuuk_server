@@ -14,6 +14,12 @@ export class StepBE extends Document {
 
   @Prop()
   picture: string;
+
+  @Prop({ required: true })
+  sortNr: number;
+
+  @Prop()
+  group: string;
 }
 
 export const StepMongoSchema = SchemaFactory.createForClass(StepBE);

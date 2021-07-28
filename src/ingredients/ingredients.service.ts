@@ -30,6 +30,7 @@ export class IngredientsService {
       name: addIngredientInput.name,
       amount: addIngredientInput.amount,
       unit: addIngredientInput.unit,
+      group: addIngredientInput.group,
     });
     await newIngredientBE.save();
     return IngredientMappers.BEtoDTO(newIngredientBE);
@@ -43,6 +44,8 @@ export class IngredientsService {
       name: updateIngredientInput.name ?? undefined,
       amount: updateIngredientInput.amount ?? undefined,
       unit: updateIngredientInput.unit ?? undefined,
+      sortNr: updateIngredientInput.sortNr ?? undefined,
+      group: updateIngredientInput.group ?? undefined,
     };
     const ingredientBE = await this.ingredientModel.findByIdAndUpdate(
       update.id,
@@ -71,9 +74,7 @@ export class IngredientsService {
   }
 
   async getAllNames(): Promise<string[]> {
-    return (await this.ingredientModel.find().select('name').exec()).map(
-      (i) => i.name,
-    );
+    return this.ingredientModel.distinct('name');
   }
 
   async findAllByRecipeID(id: string): Promise<IngredientDTO[]> {

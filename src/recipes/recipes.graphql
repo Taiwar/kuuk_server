@@ -1,14 +1,25 @@
-type StepDTO {
+interface OrderedRecipeItem {
+  id: String!
+  name: String!
+  sortNr: Int!
+  group: String
+}
+
+type StepDTO implements OrderedRecipeItem {
   id: String!
   name: String!
   description: String
   picture: String
+  sortNr: Int!
+  group: String
 }
 
 type NoteDTO {
   id: String!
   name: String!
   description: String
+  sortNr: Int!
+  group: String
 }
 
 type IngredientDTO {
@@ -16,6 +27,8 @@ type IngredientDTO {
   name: String!
   amount: Float!
   unit: String!
+  sortNr: Int!
+  group: String
 }
 
 type RecipeDTO {
@@ -80,6 +93,7 @@ input AddIngredientInput {
   name: String!
   amount: Float!
   unit: String!
+  group: String
 }
 
 input UpdateIngredientInput {
@@ -87,6 +101,8 @@ input UpdateIngredientInput {
   name: String
   amount: Float
   unit: String
+  sortNr: Int
+  group: String
 }
 
 input AddStepInput {
@@ -94,6 +110,7 @@ input AddStepInput {
   name: String!
   description: String
   picture: String
+  group: String
 }
 
 input UpdateStepInput {
@@ -101,18 +118,23 @@ input UpdateStepInput {
   name: String
   description: String
   picture: String
+  sortNr: Int
+  group: String
 }
 
 input AddNoteInput {
   recipeID: String!
   name: String!
   description: String
+  group: String
 }
 
 input UpdateNoteInput {
   id: String!
   name: String
   description: String
+  sortNr: Int
+  group: String
 }
 
 type DeletionResponse {
@@ -121,7 +143,9 @@ type DeletionResponse {
 }
 
 type Query {
-  recipes: [RecipeDTO]!
+  recipes: [RecipeDTO!]!
+  tags: [String!]!
+  ingredientNames: [String!]!
   filterRecipes(filterRecipesInput: FilterRecipesInput): [RecipeDTO]!
   recipe(id: String!): RecipeDTO
   recipeBySlug(slug: String!): RecipeDTO
