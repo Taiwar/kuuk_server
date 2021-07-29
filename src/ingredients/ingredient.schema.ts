@@ -13,6 +13,14 @@ export class IngredientBE extends Document {
   })
   recipeID: string;
 
+  @Prop({
+    type: MongoSchema.Types.ObjectId,
+    ref: 'Group',
+    required: true,
+    index: true,
+  })
+  groupID: string;
+
   @Prop({ required: true })
   name: string;
 
@@ -24,9 +32,6 @@ export class IngredientBE extends Document {
 
   @Prop({ required: true })
   sortNr: number;
-
-  @Prop()
-  group: string;
 }
 
 export const IngredientMongoSchema = SchemaFactory.createForClass(IngredientBE);

@@ -3,8 +3,21 @@ import { Document, Schema as MongoSchema } from 'mongoose';
 
 @Schema()
 export class NoteBE extends Document {
-  @Prop({ type: MongoSchema.Types.ObjectId, ref: 'Recipe', required: true })
+  @Prop({
+    type: MongoSchema.Types.ObjectId,
+    ref: 'Recipe',
+    required: true,
+    index: true,
+  })
   recipeID: string;
+
+  @Prop({
+    type: MongoSchema.Types.ObjectId,
+    ref: 'Group',
+    required: true,
+    index: true,
+  })
+  groupID: string;
 
   @Prop({ required: true })
   name: string;

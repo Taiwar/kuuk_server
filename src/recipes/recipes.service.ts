@@ -2,18 +2,22 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import {
+  AddGroupInput,
   AddIngredientInput,
   AddNoteInput,
   AddStepInput,
   CreateRecipeInput,
   DeletionResponse,
   FilterRecipesInput,
+  GroupDTO,
   IngredientDTO,
   NoteDTO,
   RecipeDTO,
   StepDTO,
   UpdateRecipeInput,
 } from '../graphql';
+import { GroupItemTypes } from '../groups/group.schema';
+import { GroupsService } from '../groups/groups.service';
 import { IngredientsService } from '../ingredients/ingredients.service';
 import { NotesService } from '../notes/notes.service';
 import { StepsService } from '../steps/steps.service';
@@ -31,6 +35,7 @@ export class RecipesService {
     private readonly ingredientsService: IngredientsService,
     private readonly stepsService: StepsService,
     private readonly notesService: NotesService,
+    private readonly groupsService: GroupsService,
   ) {}
 
   public async findOneById(id: string): Promise<RecipeDTO> {
@@ -226,6 +231,86 @@ export class RecipesService {
     return {
       id: noteId,
       success: deleteResult !== null && removeResult !== null,
+    };
+  }
+
+  public async addGroup(addGroupInput: AddGroupInput): Promise<GroupDTO> {
+    const newGroupDTO = await this.groupsService.create(addGroupInput);
+    let recipeUpdate = {};
+    switch (addGroupInput.itemType) {
+      case GroupItemTypes.IngredientBE:
+        recipeUpdate = {
+          $addToSet: {
+            ingredients: newGroupDTO.id,
+          },
+        };
+        break;
+      case GroupItemTypes.StepBE:
+        recipeUpdate = {
+          $addToSet: {
+            steps: newGroupDTO.id,
+          },
+        };
+        break;
+      case GroupItemTypes.NoteBE:
+        recipeUpdate = {
+          $addToSet: {
+            notes: newGroupDTO.id,
+          },
+        };
+        break;
+    }
+    this.recipeModel.findByIdAndUpdate(addGroupInput.recipeID, recipeUpdate);
+    return newGroupDTO;
+  }
+
+  public async removeGroup(
+    groupId: string,
+    recipeId: string,
+  ): Promise<DeletionResponse> {
+    const groupDTO = await this.groupsService.findOneById(groupId);
+    if (!groupDTO) {
+      throw new NotFoundException(`Group #${groupId} not found`);
+    }
+    let removeQuery = {};
+    let deleteItemsResult;
+    switch (groupDTO.itemType) {
+      case 'IngredientDTO':
+        removeQuery = {
+          $pull: {
+            ingredients: groupId,
+          },
+        };
+        deleteItemsResult = this.ingredientsService.deleteByGroupId(groupId);
+        break;
+      case 'StepDTO':
+        removeQuery = {
+          $pull: {
+            steps: groupId,
+          },
+        };
+        deleteItemsResult = this.stepsService.deleteByGroupId(groupId);
+        break;
+      case 'NoteDTO':
+        removeQuery = {
+          $pull: {
+            notes: groupId,
+          },
+        };
+        deleteItemsResult = this.notesService.deleteByGroupId(groupId);
+        break;
+    }
+    const removeResult = await this.recipeModel.findByIdAndUpdate(
+      recipeId,
+      removeQuery,
+    );
+    const deleteResult = await this.groupsService.delete(groupId);
+    return {
+      id: groupId,
+      success:
+        deleteResult !== null &&
+        removeResult !== null &&
+        deleteItemsResult !== null,
     };
   }
 }

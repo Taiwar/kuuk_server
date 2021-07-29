@@ -7,21 +7,29 @@ import {
   Resolver,
 } from '@nestjs/graphql';
 import {
+  AddGroupInput,
   AddIngredientInput,
   AddNoteInput,
   AddStepInput,
   CreateRecipeInput,
   DeletionResponse,
   FilterRecipesInput,
+  GroupDTO,
   IngredientDTO,
+  IngredientItem,
   NoteDTO,
+  NoteItem,
   RecipeDTO,
   StepDTO,
+  StepItem,
+  UpdateGroupInput,
   UpdateIngredientInput,
   UpdateNoteInput,
   UpdateRecipeInput,
   UpdateStepInput,
 } from '../graphql';
+import { GroupItemTypes } from '../groups/group.schema';
+import { GroupsService } from '../groups/groups.service';
 import { IngredientsService } from '../ingredients/ingredients.service';
 import { NotesService } from '../notes/notes.service';
 import { StepsService } from '../steps/steps.service';
@@ -34,24 +42,38 @@ export class RecipesResolver {
     private ingredientsService: IngredientsService,
     private stepService: StepsService,
     private notesService: NotesService,
+    private groupsService: GroupsService,
   ) {}
 
   @ResolveField()
-  async steps(@Parent() recipe): Promise<StepDTO[]> {
+  async steps(@Parent() recipe): Promise<StepItem[]> {
     const { id } = recipe;
-    return this.stepService.findAllByRecipeID(id);
+    const steps = await this.stepService.findAllByRecipeID(id);
+    const stepGroups = await this.groupsService.findAllByRecipeIDAndItemType(
+      id,
+      'StepBE',
+    );
+    return [...stepGroups, ...steps];
   }
 
   @ResolveField()
-  async ingredients(@Parent() recipe): Promise<IngredientDTO[]> {
+  async ingredients(@Parent() recipe): Promise<IngredientItem[]> {
     const { id } = recipe;
-    return this.ingredientsService.findAllByRecipeID(id);
+    const ingredients = await this.ingredientsService.findAllByRecipeID(id);
+    const ingredientGroups =
+      await this.groupsService.findAllByRecipeIDAndItemType(id, 'IngredientBE');
+    return [...ingredientGroups, ...ingredients];
   }
 
   @ResolveField()
-  async notes(@Parent() recipe): Promise<NoteDTO[]> {
+  async notes(@Parent() recipe): Promise<NoteItem[]> {
     const { id } = recipe;
-    return this.notesService.findAllByRecipeID(id);
+    const notes = await this.notesService.findAllByRecipeID(id);
+    const noteGroups = await this.groupsService.findAllByRecipeIDAndItemType(
+      id,
+      'NoteBE',
+    );
+    return [...noteGroups, ...notes];
   }
 
   @Query()
@@ -113,6 +135,18 @@ export class RecipesResolver {
   }
 
   @Mutation()
+  async addIngredientToGroup(
+    @Args('ingredientID') ingredientId: string,
+    @Args('groupID') groupId: string,
+  ): Promise<GroupDTO> {
+    return this.groupsService.addItem(
+      ingredientId,
+      GroupItemTypes.IngredientBE,
+      groupId,
+    );
+  }
+
+  @Mutation()
   async updateIngredient(
     @Args('updateIngredientInput') updateIngredientInput: UpdateIngredientInput,
   ): Promise<IngredientDTO> {
@@ -132,6 +166,14 @@ export class RecipesResolver {
     @Args('addStepInput') addStepInput: AddStepInput,
   ): Promise<StepDTO> {
     return this.recipesService.addStep(addStepInput);
+  }
+
+  @Mutation()
+  async addStepToGroup(
+    @Args('stepID') stepId: string,
+    @Args('groupID') groupId: string,
+  ): Promise<GroupDTO> {
+    return this.groupsService.addItem(stepId, GroupItemTypes.StepBE, groupId);
   }
 
   @Mutation()
@@ -157,6 +199,14 @@ export class RecipesResolver {
   }
 
   @Mutation()
+  async addNoteToGroup(
+    @Args('noteID') noteId: string,
+    @Args('groupID') groupId: string,
+  ): Promise<GroupDTO> {
+    return this.groupsService.addItem(noteId, GroupItemTypes.NoteBE, groupId);
+  }
+
+  @Mutation()
   async updateNote(
     @Args('updateNoteInput') updateNoteInput: UpdateNoteInput,
   ): Promise<NoteDTO> {
@@ -169,5 +219,27 @@ export class RecipesResolver {
     @Args('recipeID') recipeId: string,
   ): Promise<DeletionResponse> {
     return this.recipesService.removeNote(noteId, recipeId);
+  }
+
+  @Mutation()
+  async addGroup(
+    @Args('addGroupInput') addGroupInput: AddGroupInput,
+  ): Promise<NoteDTO> {
+    return this.recipesService.addGroup(addGroupInput);
+  }
+
+  @Mutation()
+  async updateGroup(
+    @Args('updateGroupInput') updateGroupInput: UpdateGroupInput,
+  ): Promise<NoteDTO> {
+    return this.groupsService.update(updateGroupInput);
+  }
+
+  @Mutation()
+  async removeGroup(
+    @Args('groupID') groupId: string,
+    @Args('recipeID') recipeId: string,
+  ): Promise<DeletionResponse> {
+    return this.recipesService.removeGroup(groupId, recipeId);
   }
 }

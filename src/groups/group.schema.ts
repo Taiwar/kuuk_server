@@ -1,8 +1,14 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongoSchema } from 'mongoose';
 
+export enum GroupItemTypes {
+  IngredientBE = 'IngredientBE',
+  StepBE = 'StepBE',
+  NoteBE = 'NoteBE',
+}
+
 @Schema()
-export class StepBE extends Document {
+export class GroupBE extends Document {
   @Prop({
     type: MongoSchema.Types.ObjectId,
     ref: 'Recipe',
@@ -11,28 +17,14 @@ export class StepBE extends Document {
   })
   recipeID: string;
 
-  @Prop({
-    type: MongoSchema.Types.ObjectId,
-    ref: 'Group',
-    required: true,
-    index: true,
-  })
-  groupID: string;
+  @Prop({ required: true })
+  itemType: string;
 
   @Prop({ required: true })
   name: string;
 
-  @Prop()
-  description: string;
-
-  @Prop()
-  picture: string;
-
   @Prop({ required: true })
   sortNr: number;
-
-  @Prop()
-  group: string;
 }
 
-export const StepMongoSchema = SchemaFactory.createForClass(StepBE);
+export const GroupMongoSchema = SchemaFactory.createForClass(GroupBE);

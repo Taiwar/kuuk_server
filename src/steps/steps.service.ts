@@ -24,7 +24,6 @@ export class StepsService {
       name: addStepInput.name,
       description: addStepInput.description,
       picture: addStepInput.picture,
-      group: addStepInput.group,
     });
     await newStepBE.save();
     return StepMappers.BEtoDTO(newStepBE);
@@ -37,7 +36,6 @@ export class StepsService {
       description: updateStepInput.description ?? undefined,
       picture: updateStepInput.picture ?? undefined,
       sortNr: updateStepInput.sortNr ?? undefined,
-      group: updateStepInput.group ?? undefined,
     };
     const stepBE = await this.stepModel.findByIdAndUpdate(update.id, update, {
       new: true,
@@ -56,6 +54,13 @@ export class StepsService {
     return deleteResult !== null;
   }
 
+  public async deleteByGroupId(groupId: string): Promise<boolean> {
+    const deleteResult = await this.stepModel.deleteMany({
+      groupID: groupId,
+    });
+    return deleteResult !== null;
+  }
+
   async getAll(): Promise<StepDTO[]> {
     return (await this.stepModel.find()).map((i) => StepMappers.BEtoDTO(i));
   }
@@ -68,6 +73,12 @@ export class StepsService {
 
   async findAllByRecipeID(id: string): Promise<StepDTO[]> {
     return (await this.stepModel.find({ recipeID: id })).map((i) =>
+      StepMappers.BEtoDTO(i),
+    );
+  }
+
+  async findAllByGroupID(id: string): Promise<StepDTO[]> {
+    return (await this.stepModel.find({ groupID: id })).map((i) =>
       StepMappers.BEtoDTO(i),
     );
   }

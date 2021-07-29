@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { GroupsModule } from '../groups/groups.module';
 import { IngredientsModule } from '../ingredients/ingredients.module';
 import { NotesModule } from '../notes/notes.module';
 import { StepsModule } from '../steps/steps.module';
@@ -12,6 +13,7 @@ import { RecipesService } from './recipes.service';
     IngredientsModule,
     StepsModule,
     NotesModule,
+    GroupsModule,
     MongooseModule.forFeature([
       { name: RecipeBE.name, schema: RecipeMongoSchema },
     ]),

@@ -23,7 +23,6 @@ export class NotesService {
       recipeID: addNoteInput.recipeID,
       name: addNoteInput.name,
       description: addNoteInput.description,
-      group: addNoteInput.group,
     });
     await newNoteBE.save();
     return NoteMappers.BEtoDTO(newNoteBE);
@@ -35,7 +34,6 @@ export class NotesService {
       name: updateNoteInput.name ?? undefined,
       description: updateNoteInput.description ?? undefined,
       sortNr: updateNoteInput.sortNr ?? undefined,
-      group: updateNoteInput.group ?? undefined,
     };
     const noteBE = await this.noteModel.findByIdAndUpdate(update.id, update, {
       new: true,
@@ -54,6 +52,13 @@ export class NotesService {
     return deleteResult !== null;
   }
 
+  public async deleteByGroupId(groupId: string): Promise<boolean> {
+    const deleteResult = await this.noteModel.deleteMany({
+      groupID: groupId,
+    });
+    return deleteResult !== null;
+  }
+
   async getAll(): Promise<NoteDTO[]> {
     return (await this.noteModel.find()).map((i) => NoteMappers.BEtoDTO(i));
   }
@@ -66,6 +71,12 @@ export class NotesService {
 
   async findAllByRecipeID(id: string): Promise<NoteDTO[]> {
     return (await this.noteModel.find({ recipeID: id })).map((i) =>
+      NoteMappers.BEtoDTO(i),
+    );
+  }
+
+  async findAllByGroupID(id: string): Promise<NoteDTO[]> {
+    return (await this.noteModel.find({ groupID: id })).map((i) =>
       NoteMappers.BEtoDTO(i),
     );
   }
