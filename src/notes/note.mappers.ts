@@ -5,6 +5,7 @@ export default class NoteMappers {
   static BEtoDTO(noteBE: NoteBE): NoteDTO {
     return {
       id: noteBE._id,
+      groupID: noteBE.groupID,
       recipeID: noteBE.recipeID,
       name: noteBE.name,
       description: noteBE.description,

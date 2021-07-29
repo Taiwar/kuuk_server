@@ -6,6 +6,7 @@ export default class IngredientMappers {
     return {
       id: ingredientBE._id,
       recipeID: ingredientBE.recipeID,
+      groupID: ingredientBE.groupID,
       name: ingredientBE.name,
       amount: ingredientBE.amount,
       unit: ingredientBE.unit,

@@ -1,16 +1,10 @@
-import {
-  BadRequestException,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import {
   AddGroupInput,
   DeletionResponse,
   GroupDTO,
-  OrderedRecipeItem,
   UpdateGroupInput,
 } from '../graphql';
 import { IngredientsService } from '../ingredients/ingredients.service';
@@ -31,6 +25,12 @@ export class GroupsService {
     private readonly groupModel: Model<GroupBE>,
   ) {}
 
+  public async countInOrderGroup(recipeId: string): Promise<number> {
+    return this.groupModel.countDocuments({
+      recipeID: recipeId,
+    });
+  }
+
   public async findOneById(id: string): Promise<GroupDTO> {
     return GroupMappers.BEtoDTO(await this.groupModel.findById(id));
   }
@@ -40,12 +40,14 @@ export class GroupsService {
       recipeID: addGroupInput.recipeID,
       name: addGroupInput.name,
       itemType: addGroupInput.itemType,
+      sortNr: (await this.countInOrderGroup(addGroupInput.recipeID)) + 1,
     });
     await newGroupBE.save();
     return GroupMappers.BEtoDTO(newGroupBE);
   }
 
   public async update(updateGroupInput: UpdateGroupInput): Promise<GroupDTO> {
+    // TODO: Reorder other items in recipe
     const update: UpdateGroupInput = {
       id: updateGroupInput.id,
       name: updateGroupInput.name ?? undefined,
@@ -63,9 +65,13 @@ export class GroupsService {
     return GroupMappers.BEtoDTO(groupBE);
   }
 
-  public async delete(id: string): Promise<boolean> {
+  public async delete(id: string): Promise<DeletionResponse> {
+    // TODO: Reorder other items in recipe
     const deleteResult = await this.groupModel.findByIdAndDelete(id);
-    return deleteResult !== null;
+    return {
+      id,
+      success: deleteResult !== null,
+    };
   }
 
   async findAllByRecipeIDAndItemType(
@@ -94,67 +100,5 @@ export class GroupsService {
       }
     }
     return groupDTOs;
-  }
-
-  public async addItem(
-    itemId: string,
-    itemType: GroupItemTypes,
-    groupId: string,
-  ): Promise<GroupDTO> {
-    const groupDTO = await this.findOneById(groupId);
-    if (!groupDTO) {
-      throw new NotFoundException(`Group ${groupDTO.id} not found`);
-    }
-
-    if (groupDTO.itemType !== itemType) {
-      throw new BadRequestException(
-        `Group ${groupId} is not an ${itemType} group!`,
-      );
-    }
-
-    let itemDTO: OrderedRecipeItem;
-    switch (itemType) {
-      case GroupItemTypes.IngredientBE:
-        itemDTO = await this.ingredientsService.findOneById(itemId);
-        break;
-      case GroupItemTypes.StepBE:
-        itemDTO = await this.stepsService.findOneById(itemId);
-        break;
-      case GroupItemTypes.NoteBE:
-        itemDTO = await this.notesService.findOneById(itemId);
-        break;
-    }
-
-    if (!itemDTO) {
-      throw new NotFoundException(`${itemType} ${itemId} not found`);
-    }
-    if (groupDTO.recipeID !== itemDTO.recipeID) {
-      throw new BadRequestException(
-        `Group ${groupId} and ${itemType} ${itemId} are not in the same recipe!`,
-      );
-    }
-
-    const groupBE = await this.groupModel.findByIdAndUpdate(groupId, {
-      $addToSet: {
-        items: itemId,
-      },
-    });
-
-    return GroupMappers.BEtoDTO(groupBE);
-  }
-
-  public async removeItem(
-    itemId: string,
-    groupId: string,
-  ): Promise<DeletionResponse> {
-    const removeResult = await this.groupModel.findByIdAndUpdate(groupId, {
-      $pull: {
-        items: itemId,
-      },
-    });
-    return {
-      id: itemId,
-      success: removeResult !== null,
-    };
   }
 }

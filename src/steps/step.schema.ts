@@ -14,7 +14,6 @@ export class StepBE extends Document {
   @Prop({
     type: MongoSchema.Types.ObjectId,
     ref: 'Group',
-    required: true,
     index: true,
   })
   groupID: string;

@@ -1,7 +1,12 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { AddStepInput, StepDTO, UpdateStepInput } from '../graphql';
+import {
+  AddStepInput,
+  DeletionResponse,
+  StepDTO,
+  UpdateStepInput,
+} from '../graphql';
 import StepMappers from './step.mappers';
 import { StepBE } from './step.schema';
 
@@ -15,7 +20,28 @@ export class StepsService {
   ) {}
 
   public async findOneById(id: string): Promise<StepDTO> {
-    return StepMappers.BEtoDTO(await this.stepModel.findById(id));
+    const stepBE = await this.stepModel.findById(id);
+    if (!stepBE) {
+      throw new NotFoundException(`Step ${id} not found`);
+    }
+    return StepMappers.BEtoDTO(stepBE);
+  }
+
+  public async countInOrderGroup(
+    recipeId: string,
+    groupId = null,
+  ): Promise<number> {
+    let count: number;
+    if (groupId) {
+      count = await this.stepModel.countDocuments({
+        groupID: groupId,
+      });
+    } else {
+      count = await this.stepModel.countDocuments({
+        recipeID: recipeId,
+      });
+    }
+    return count;
   }
 
   public async create(addStepInput: AddStepInput): Promise<StepDTO> {
@@ -30,6 +56,7 @@ export class StepsService {
   }
 
   public async update(updateStepInput: UpdateStepInput): Promise<StepDTO> {
+    // TODO: Reorder other steps in recipe/group
     const update: UpdateStepInput = {
       id: updateStepInput.id,
       name: updateStepInput.name ?? undefined,
@@ -49,9 +76,13 @@ export class StepsService {
     return StepMappers.BEtoDTO(stepBE);
   }
 
-  public async delete(id: string): Promise<boolean> {
+  public async delete(id: string): Promise<DeletionResponse> {
+    // TODO: Reorder other steps in recipe/group
     const deleteResult = await this.stepModel.findByIdAndDelete(id);
-    return deleteResult !== null;
+    return {
+      id,
+      success: deleteResult !== null,
+    };
   }
 
   public async deleteByGroupId(groupId: string): Promise<boolean> {

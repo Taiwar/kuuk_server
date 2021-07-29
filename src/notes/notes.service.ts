@@ -1,7 +1,12 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { AddNoteInput, NoteDTO, UpdateNoteInput } from '../graphql';
+import {
+  AddNoteInput,
+  DeletionResponse,
+  NoteDTO,
+  UpdateNoteInput,
+} from '../graphql';
 import NoteMappers from './note.mappers';
 import { NoteBE } from './note.schema';
 
@@ -15,7 +20,28 @@ export class NotesService {
   ) {}
 
   public async findOneById(id: string): Promise<NoteDTO> {
-    return NoteMappers.BEtoDTO(await this.noteModel.findById(id));
+    const noteBE = await this.noteModel.findById(id);
+    if (!noteBE) {
+      throw new NotFoundException(`Note ${id} not found`);
+    }
+    return NoteMappers.BEtoDTO(noteBE);
+  }
+
+  public async countInOrderGroup(
+    recipeId: string,
+    groupId = null,
+  ): Promise<number> {
+    let count: number;
+    if (groupId) {
+      count = await this.noteModel.countDocuments({
+        groupID: groupId,
+      });
+    } else {
+      count = await this.noteModel.countDocuments({
+        recipeID: recipeId,
+      });
+    }
+    return count;
   }
 
   public async create(addNoteInput: AddNoteInput): Promise<NoteDTO> {
@@ -47,9 +73,13 @@ export class NotesService {
     return NoteMappers.BEtoDTO(noteBE);
   }
 
-  public async delete(id: string): Promise<boolean> {
+  public async delete(id: string): Promise<DeletionResponse> {
+    // TODO: Reorder other notes in recipe/group
     const deleteResult = await this.noteModel.findByIdAndDelete(id);
-    return deleteResult !== null;
+    return {
+      id,
+      success: deleteResult !== null,
+    };
   }
 
   public async deleteByGroupId(groupId: string): Promise<boolean> {
