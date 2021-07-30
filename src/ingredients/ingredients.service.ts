@@ -3,10 +3,15 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import {
   AddIngredientInput,
-  DeletionResponse,
+  GroupItemDeletionResponse,
   IngredientDTO,
   UpdateIngredientInput,
 } from '../graphql';
+import {
+  checkAllowedOrdering,
+  reorderOrderedItems,
+  reorderOrderedItemsAfterDelete,
+} from '../shared/reorderingHelper';
 import IngredientMappers from './ingredient.mappers';
 import { IngredientBE } from './ingredient.schema';
 
@@ -26,21 +31,11 @@ export class IngredientsService {
     }
     return IngredientMappers.BEtoDTO(ingredientBE);
   }
-  public async countInOrderGroup(
-    recipeId: string,
-    groupId = null,
-  ): Promise<number> {
-    let count: number;
-    if (groupId) {
-      count = await this.ingredientModel.countDocuments({
-        groupID: groupId,
-      });
-    } else {
-      count = await this.ingredientModel.countDocuments({
-        recipeID: recipeId,
-      });
-    }
-    return count;
+
+  public async countInOrderGroup(groupId: string): Promise<number> {
+    return this.ingredientModel.countDocuments({
+      groupID: groupId,
+    });
   }
 
   public async create(
@@ -51,7 +46,8 @@ export class IngredientsService {
       name: addIngredientInput.name,
       amount: addIngredientInput.amount,
       unit: addIngredientInput.unit,
-      sortNr: (await this.countInOrderGroup(addIngredientInput.recipeID)) + 1, // This asserts that when an item get deleted, the sortNr of the remaining items are adjusted to always start at 1 and leave NO spaces
+      groupID: addIngredientInput.groupID,
+      sortNr: (await this.countInOrderGroup(addIngredientInput.groupID)) + 1,
     });
     await newIngredientBE.save();
     return IngredientMappers.BEtoDTO(newIngredientBE);
@@ -60,11 +56,20 @@ export class IngredientsService {
   public async update(
     updateIngredientInput: UpdateIngredientInput,
   ): Promise<IngredientDTO> {
+    const ingredientDTO = await this.findOneById(updateIngredientInput.id);
+
+    await checkAllowedOrdering(
+      ingredientDTO.sortNr,
+      updateIngredientInput.sortNr,
+      await this.countInOrderGroup(ingredientDTO.recipeID),
+    );
+
     const update: UpdateIngredientInput = {
       id: updateIngredientInput.id,
       name: updateIngredientInput.name ?? undefined,
       amount: updateIngredientInput.amount ?? undefined,
       unit: updateIngredientInput.unit ?? undefined,
+      groupID: updateIngredientInput.groupID ?? undefined,
       sortNr: updateIngredientInput.sortNr ?? undefined,
     };
     const ingredientBE = await this.ingredientModel.findByIdAndUpdate(
@@ -73,21 +78,28 @@ export class IngredientsService {
       { new: true, omitUndefined: true },
     );
 
-    if (!ingredientBE) {
-      throw new NotFoundException(
-        `Ingredient #${updateIngredientInput.id} not found`,
-      );
-    }
+    await reorderOrderedItems(
+      ingredientBE.id,
+      ingredientBE.recipeID,
+      this.ingredientModel as Model<any>,
+      ingredientDTO.sortNr,
+      updateIngredientInput.sortNr,
+    );
 
     return IngredientMappers.BEtoDTO(ingredientBE);
   }
 
-  public async delete(id: string): Promise<DeletionResponse> {
-    // TODO: Reorder other ingredients in recipe/group
+  public async delete(id: string): Promise<GroupItemDeletionResponse> {
     const deleteResult = await this.ingredientModel.findByIdAndDelete(id);
+    const updateHigherIngredients = await reorderOrderedItemsAfterDelete(
+      deleteResult.sortNr,
+      deleteResult.recipeID,
+      this.ingredientModel as Model<any>,
+    );
     return {
       id,
-      success: deleteResult !== null,
+      groupID: deleteResult.groupID,
+      success: !!updateHigherIngredients,
     };
   }
 

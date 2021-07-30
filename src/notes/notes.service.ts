@@ -3,10 +3,15 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import {
   AddNoteInput,
-  DeletionResponse,
+  GroupItemDeletionResponse,
   NoteDTO,
   UpdateNoteInput,
 } from '../graphql';
+import {
+  checkAllowedOrdering,
+  reorderOrderedItems,
+  reorderOrderedItemsAfterDelete,
+} from '../shared/reorderingHelper';
 import NoteMappers from './note.mappers';
 import { NoteBE } from './note.schema';
 
@@ -27,21 +32,10 @@ export class NotesService {
     return NoteMappers.BEtoDTO(noteBE);
   }
 
-  public async countInOrderGroup(
-    recipeId: string,
-    groupId = null,
-  ): Promise<number> {
-    let count: number;
-    if (groupId) {
-      count = await this.noteModel.countDocuments({
-        groupID: groupId,
-      });
-    } else {
-      count = await this.noteModel.countDocuments({
-        recipeID: recipeId,
-      });
-    }
-    return count;
+  public async countInOrderGroup(groupId: string): Promise<number> {
+    return this.noteModel.countDocuments({
+      groupID: groupId,
+    });
   }
 
   public async create(addNoteInput: AddNoteInput): Promise<NoteDTO> {
@@ -49,16 +43,27 @@ export class NotesService {
       recipeID: addNoteInput.recipeID,
       name: addNoteInput.name,
       description: addNoteInput.description,
+      groupID: addNoteInput.groupID,
+      sortNr: (await this.countInOrderGroup(addNoteInput.groupID)) + 1,
     });
     await newNoteBE.save();
     return NoteMappers.BEtoDTO(newNoteBE);
   }
 
   public async update(updateNoteInput: UpdateNoteInput): Promise<NoteDTO> {
+    const noteDTO = await this.findOneById(updateNoteInput.id);
+
+    await checkAllowedOrdering(
+      noteDTO.sortNr,
+      updateNoteInput.sortNr,
+      await this.countInOrderGroup(noteDTO.recipeID),
+    );
+
     const update: UpdateNoteInput = {
       id: updateNoteInput.id,
       name: updateNoteInput.name ?? undefined,
       description: updateNoteInput.description ?? undefined,
+      groupID: updateNoteInput.groupID ?? undefined,
       sortNr: updateNoteInput.sortNr ?? undefined,
     };
     const noteBE = await this.noteModel.findByIdAndUpdate(update.id, update, {
@@ -66,19 +71,28 @@ export class NotesService {
       omitUndefined: true,
     });
 
-    if (!noteBE) {
-      throw new NotFoundException(`Note #${updateNoteInput.id} not found`);
-    }
+    await reorderOrderedItems(
+      noteBE.id,
+      noteBE.recipeID,
+      this.noteModel as Model<any>,
+      noteDTO.sortNr,
+      updateNoteInput.sortNr,
+    );
 
     return NoteMappers.BEtoDTO(noteBE);
   }
 
-  public async delete(id: string): Promise<DeletionResponse> {
-    // TODO: Reorder other notes in recipe/group
+  public async delete(id: string): Promise<GroupItemDeletionResponse> {
     const deleteResult = await this.noteModel.findByIdAndDelete(id);
+    const updateHigherNotes = await reorderOrderedItemsAfterDelete(
+      deleteResult.sortNr,
+      deleteResult.recipeID,
+      this.noteModel as Model<any>,
+    );
     return {
       id,
-      success: deleteResult !== null,
+      groupID: deleteResult.groupID,
+      success: !!updateHigherNotes,
     };
   }
 

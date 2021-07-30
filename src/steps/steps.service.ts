@@ -3,10 +3,15 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import {
   AddStepInput,
-  DeletionResponse,
+  GroupItemDeletionResponse,
   StepDTO,
   UpdateStepInput,
 } from '../graphql';
+import {
+  checkAllowedOrdering,
+  reorderOrderedItems,
+  reorderOrderedItemsAfterDelete,
+} from '../shared/reorderingHelper';
 import StepMappers from './step.mappers';
 import { StepBE } from './step.schema';
 
@@ -27,21 +32,10 @@ export class StepsService {
     return StepMappers.BEtoDTO(stepBE);
   }
 
-  public async countInOrderGroup(
-    recipeId: string,
-    groupId = null,
-  ): Promise<number> {
-    let count: number;
-    if (groupId) {
-      count = await this.stepModel.countDocuments({
-        groupID: groupId,
-      });
-    } else {
-      count = await this.stepModel.countDocuments({
-        recipeID: recipeId,
-      });
-    }
-    return count;
+  public async countInOrderGroup(groupId: string): Promise<number> {
+    return this.stepModel.countDocuments({
+      groupID: groupId,
+    });
   }
 
   public async create(addStepInput: AddStepInput): Promise<StepDTO> {
@@ -49,19 +43,29 @@ export class StepsService {
       recipeID: addStepInput.recipeID,
       name: addStepInput.name,
       description: addStepInput.description,
-      picture: addStepInput.picture,
+      picture: addStepInput.picture ?? '',
+      sortNr: (await this.countInOrderGroup(addStepInput.groupID)) + 1,
+      groupID: addStepInput.groupID,
     });
     await newStepBE.save();
     return StepMappers.BEtoDTO(newStepBE);
   }
 
   public async update(updateStepInput: UpdateStepInput): Promise<StepDTO> {
-    // TODO: Reorder other steps in recipe/group
+    const stepDTO = await this.findOneById(updateStepInput.id);
+
+    await checkAllowedOrdering(
+      stepDTO.sortNr,
+      updateStepInput.sortNr,
+      await this.countInOrderGroup(stepDTO.recipeID),
+    );
+
     const update: UpdateStepInput = {
       id: updateStepInput.id,
       name: updateStepInput.name ?? undefined,
       description: updateStepInput.description ?? undefined,
       picture: updateStepInput.picture ?? undefined,
+      groupID: updateStepInput.groupID ?? undefined,
       sortNr: updateStepInput.sortNr ?? undefined,
     };
     const stepBE = await this.stepModel.findByIdAndUpdate(update.id, update, {
@@ -69,19 +73,28 @@ export class StepsService {
       omitUndefined: true,
     });
 
-    if (!stepBE) {
-      throw new NotFoundException(`Step #${updateStepInput.id} not found`);
-    }
+    await reorderOrderedItems(
+      stepBE.id,
+      stepBE.recipeID,
+      this.stepModel as Model<any>,
+      stepDTO.sortNr,
+      updateStepInput.sortNr,
+    );
 
     return StepMappers.BEtoDTO(stepBE);
   }
 
-  public async delete(id: string): Promise<DeletionResponse> {
-    // TODO: Reorder other steps in recipe/group
+  public async delete(id: string): Promise<GroupItemDeletionResponse> {
     const deleteResult = await this.stepModel.findByIdAndDelete(id);
+    const updateHigherSteps = await reorderOrderedItemsAfterDelete(
+      deleteResult.sortNr,
+      deleteResult.recipeID,
+      this.stepModel as Model<any>,
+    );
     return {
       id,
-      success: deleteResult !== null,
+      groupID: deleteResult.groupID,
+      success: !!updateHigherSteps,
     };
   }
 

@@ -8,6 +8,8 @@ import {
   RecipeDTO,
   UpdateRecipeInput,
 } from '../graphql';
+import { DEFAULT_GROUP_NAME, GroupItemTypes } from '../groups/group.schema';
+import { GroupsService } from '../groups/groups.service';
 import RecipeMappers from './recipe.mappers';
 import { RecipeBE } from './recipe.schema';
 import slugify from 'slugify';
@@ -19,6 +21,7 @@ export class RecipesService {
   constructor(
     @InjectModel(RecipeBE.name)
     private readonly recipeModel: Model<RecipeBE>,
+    private readonly groupsService: GroupsService,
   ) {}
 
   public async findOneById(id: string): Promise<RecipeDTO> {
@@ -89,6 +92,14 @@ export class RecipesService {
       pictures: createRecipeInput.pictures,
     });
     await newRecipeBE.save();
+    // Create default groups for each type
+    for (const itemType of Object.values(GroupItemTypes)) {
+      await this.groupsService.create({
+        name: DEFAULT_GROUP_NAME,
+        recipeID: newRecipeBE.id,
+        itemType,
+      });
+    }
 
     return RecipeMappers.BEtoDTO(newRecipeBE);
   }

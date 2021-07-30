@@ -9,6 +9,7 @@ export default class GroupMappers {
       name: groupBE.name,
       itemType: groupBE.itemType,
       sortNr: groupBE.sortNr,
+      items: [],
     };
   }
 }

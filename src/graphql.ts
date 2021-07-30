@@ -50,7 +50,7 @@ export interface AddIngredientInput {
     name: string;
     amount: number;
     unit: string;
-    groupID?: Nullable<string>;
+    groupID: string;
 }
 
 export interface UpdateIngredientInput {
@@ -67,7 +67,7 @@ export interface AddStepInput {
     name: string;
     description?: Nullable<string>;
     picture?: Nullable<string>;
-    groupID?: Nullable<string>;
+    groupID: string;
 }
 
 export interface UpdateStepInput {
@@ -83,7 +83,7 @@ export interface AddNoteInput {
     recipeID: string;
     name: string;
     description?: Nullable<string>;
-    groupID?: Nullable<string>;
+    groupID: string;
 }
 
 export interface UpdateNoteInput {
@@ -114,7 +114,7 @@ export interface OrderedRecipeItemDTO {
 }
 
 export interface GroupItem {
-    groupID?: Nullable<string>;
+    groupID: string;
 }
 
 export interface GroupDTO extends OrderedRecipeItemDTO {
@@ -123,7 +123,7 @@ export interface GroupDTO extends OrderedRecipeItemDTO {
     name: string;
     sortNr: number;
     itemType: string;
-    items?: Nullable<OrderedRecipeItemDTO[]>;
+    items: OrderedRecipeItemDTO[];
 }
 
 export interface StepDTO extends OrderedRecipeItemDTO, GroupItem {
@@ -133,7 +133,7 @@ export interface StepDTO extends OrderedRecipeItemDTO, GroupItem {
     description?: Nullable<string>;
     picture?: Nullable<string>;
     sortNr: number;
-    groupID?: Nullable<string>;
+    groupID: string;
 }
 
 export interface NoteDTO extends OrderedRecipeItemDTO, GroupItem {
@@ -142,7 +142,7 @@ export interface NoteDTO extends OrderedRecipeItemDTO, GroupItem {
     name: string;
     description?: Nullable<string>;
     sortNr: number;
-    groupID?: Nullable<string>;
+    groupID: string;
 }
 
 export interface IngredientDTO extends OrderedRecipeItemDTO, GroupItem {
@@ -152,7 +152,7 @@ export interface IngredientDTO extends OrderedRecipeItemDTO, GroupItem {
     amount: number;
     unit: string;
     sortNr: number;
-    groupID?: Nullable<string>;
+    groupID: string;
 }
 
 export interface RecipeDTO {
@@ -169,13 +169,19 @@ export interface RecipeDTO {
     sourceLinks: string[];
     tags: string[];
     pictures: string[];
-    ingredients?: Nullable<IngredientItemDTO[]>;
-    steps?: Nullable<StepItemDTO[]>;
-    notes?: Nullable<NoteItemDTO[]>;
+    ingredients?: Nullable<GroupDTO[]>;
+    steps?: Nullable<GroupDTO[]>;
+    notes?: Nullable<GroupDTO[]>;
 }
 
 export interface DeletionResponse {
     id: string;
+    success: boolean;
+}
+
+export interface GroupItemDeletionResponse extends GroupItem {
+    id: string;
+    groupID: string;
     success: boolean;
 }
 
@@ -194,19 +200,16 @@ export interface IMutation {
     deleteRecipe(id: string): Nullable<DeletionResponse> | Promise<Nullable<DeletionResponse>>;
     addIngredient(addIngredientInput?: Nullable<AddIngredientInput>): Nullable<IngredientDTO> | Promise<Nullable<IngredientDTO>>;
     updateIngredient(updateIngredientInput?: Nullable<UpdateIngredientInput>): Nullable<IngredientDTO> | Promise<Nullable<IngredientDTO>>;
-    removeIngredient(ingredientID: string): Nullable<DeletionResponse> | Promise<Nullable<DeletionResponse>>;
+    removeIngredient(ingredientID: string): Nullable<GroupItemDeletionResponse> | Promise<Nullable<GroupItemDeletionResponse>>;
     addStep(addStepInput?: Nullable<AddStepInput>): Nullable<StepDTO> | Promise<Nullable<StepDTO>>;
     updateStep(updateStepInput?: Nullable<UpdateStepInput>): Nullable<StepDTO> | Promise<Nullable<StepDTO>>;
-    removeStep(stepID: string): Nullable<DeletionResponse> | Promise<Nullable<DeletionResponse>>;
+    removeStep(stepID: string): Nullable<GroupItemDeletionResponse> | Promise<Nullable<GroupItemDeletionResponse>>;
     addNote(addNoteInput?: Nullable<AddNoteInput>): Nullable<NoteDTO> | Promise<Nullable<NoteDTO>>;
     updateNote(updateNoteInput?: Nullable<UpdateNoteInput>): Nullable<NoteDTO> | Promise<Nullable<NoteDTO>>;
-    removeNote(noteID: string): Nullable<DeletionResponse> | Promise<Nullable<DeletionResponse>>;
+    removeNote(noteID: string): Nullable<GroupItemDeletionResponse> | Promise<Nullable<GroupItemDeletionResponse>>;
     addGroup(addGroupInput?: Nullable<AddGroupInput>): Nullable<GroupDTO> | Promise<Nullable<GroupDTO>>;
     updateGroup(updateGroupInput?: Nullable<UpdateGroupInput>): Nullable<GroupDTO> | Promise<Nullable<GroupDTO>>;
     removeGroup(groupID: string): Nullable<DeletionResponse> | Promise<Nullable<DeletionResponse>>;
 }
 
-export type IngredientItemDTO = IngredientDTO | GroupDTO;
-export type StepItemDTO = StepDTO | GroupDTO;
-export type NoteItemDTO = NoteDTO | GroupDTO;
 type Nullable<T> = T | null;

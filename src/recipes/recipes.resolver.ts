@@ -15,13 +15,11 @@ import {
   DeletionResponse,
   FilterRecipesInput,
   GroupDTO,
+  GroupItemDeletionResponse,
   IngredientDTO,
-  IngredientItemDTO,
   NoteDTO,
-  NoteItemDTO,
   RecipeDTO,
   StepDTO,
-  StepItemDTO,
   UpdateGroupInput,
   UpdateIngredientInput,
   UpdateNoteInput,
@@ -46,37 +44,30 @@ export class RecipesResolver {
   ) {}
 
   @ResolveField()
-  async steps(@Parent() recipe): Promise<StepItemDTO[]> {
+  async steps(@Parent() recipe): Promise<GroupDTO[]> {
     const { id } = recipe;
-    const steps = await this.stepService.findAllByRecipeID(id);
-    const stepGroups = await this.groupsService.findAllByRecipeIDAndItemType(
+    return await this.groupsService.findAllByRecipeIDAndItemType(
       id,
       GroupItemTypes.StepBE,
     );
-    return [...stepGroups, ...steps];
   }
 
   @ResolveField()
-  async ingredients(@Parent() recipe): Promise<IngredientItemDTO[]> {
+  async ingredients(@Parent() recipe): Promise<GroupDTO[]> {
     const { id } = recipe;
-    const ingredients = await this.ingredientsService.findAllByRecipeID(id);
-    const ingredientGroups =
-      await this.groupsService.findAllByRecipeIDAndItemType(
-        id,
-        GroupItemTypes.IngredientBE,
-      );
-    return [...ingredientGroups, ...ingredients];
+    return await this.groupsService.findAllByRecipeIDAndItemType(
+      id,
+      GroupItemTypes.IngredientBE,
+    );
   }
 
   @ResolveField()
-  async notes(@Parent() recipe): Promise<NoteItemDTO[]> {
+  async notes(@Parent() recipe): Promise<GroupDTO[]> {
     const { id } = recipe;
-    const notes = await this.notesService.findAllByRecipeID(id);
-    const noteGroups = await this.groupsService.findAllByRecipeIDAndItemType(
+    return await this.groupsService.findAllByRecipeIDAndItemType(
       id,
       GroupItemTypes.NoteBE,
     );
-    return [...noteGroups, ...notes];
   }
 
   @Query()
@@ -147,7 +138,7 @@ export class RecipesResolver {
   @Mutation()
   async removeIngredient(
     @Args('ingredientID') ingredientId: string,
-  ): Promise<DeletionResponse> {
+  ): Promise<GroupItemDeletionResponse> {
     return this.ingredientsService.delete(ingredientId);
   }
 
@@ -166,7 +157,9 @@ export class RecipesResolver {
   }
 
   @Mutation()
-  async removeStep(@Args('stepID') stepId: string): Promise<DeletionResponse> {
+  async removeStep(
+    @Args('stepID') stepId: string,
+  ): Promise<GroupItemDeletionResponse> {
     return this.stepService.delete(stepId);
   }
 
@@ -185,7 +178,9 @@ export class RecipesResolver {
   }
 
   @Mutation()
-  async removeNote(@Args('noteID') noteId: string): Promise<DeletionResponse> {
+  async removeNote(
+    @Args('noteID') noteId: string,
+  ): Promise<GroupItemDeletionResponse> {
     return this.notesService.delete(noteId);
   }
 

@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import {
@@ -9,6 +9,11 @@ import {
 } from '../graphql';
 import { IngredientsService } from '../ingredients/ingredients.service';
 import { NotesService } from '../notes/notes.service';
+import {
+  checkAllowedOrdering,
+  reorderOrderedItems,
+  reorderOrderedItemsAfterDelete,
+} from '../shared/reorderingHelper';
 import { StepsService } from '../steps/steps.service';
 import GroupMappers from './group.mappers';
 import { GroupBE, GroupItemTypes } from './group.schema';
@@ -47,7 +52,14 @@ export class GroupsService {
   }
 
   public async update(updateGroupInput: UpdateGroupInput): Promise<GroupDTO> {
-    // TODO: Reorder other items in recipe
+    const groupDTO = await this.findOneById(updateGroupInput.id);
+
+    await checkAllowedOrdering(
+      groupDTO.sortNr,
+      updateGroupInput.sortNr,
+      await this.countInOrderGroup(groupDTO.recipeID),
+    );
+
     const update: UpdateGroupInput = {
       id: updateGroupInput.id,
       name: updateGroupInput.name ?? undefined,
@@ -58,19 +70,45 @@ export class GroupsService {
       omitUndefined: true,
     });
 
-    if (!groupBE) {
-      throw new NotFoundException(`Group ${updateGroupInput.id} not found`);
-    }
+    await reorderOrderedItems(
+      groupBE.id,
+      groupBE.recipeID,
+      this.groupModel as Model<any>,
+      groupDTO.sortNr,
+      updateGroupInput.sortNr,
+    );
 
     return GroupMappers.BEtoDTO(groupBE);
   }
 
   public async delete(id: string): Promise<DeletionResponse> {
-    // TODO: Reorder other items in recipe
     const deleteResult = await this.groupModel.findByIdAndDelete(id);
+    const updateHigherGroups = await reorderOrderedItemsAfterDelete(
+      deleteResult.sortNr,
+      deleteResult.recipeID,
+      this.groupModel as Model<any>,
+    );
+    let deleteChildrenResult: boolean;
+    switch (deleteResult.itemType) {
+      case GroupItemTypes.IngredientBE:
+        deleteChildrenResult = await this.ingredientsService.deleteByGroupId(
+          deleteResult.id,
+        );
+        break;
+      case GroupItemTypes.StepBE:
+        deleteChildrenResult = await this.stepsService.deleteByGroupId(
+          deleteResult.id,
+        );
+        break;
+      case GroupItemTypes.NoteBE:
+        deleteChildrenResult = await this.notesService.deleteByGroupId(
+          deleteResult.id,
+        );
+        break;
+    }
     return {
       id,
-      success: deleteResult !== null,
+      success: !!updateHigherGroups && deleteChildrenResult,
     };
   }
 

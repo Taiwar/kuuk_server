@@ -1,6 +1,8 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongoSchema } from 'mongoose';
 
+export const DEFAULT_GROUP_NAME = '&%$default$%&';
+
 export enum GroupItemTypes {
   IngredientBE = 'IngredientBE',
   StepBE = 'StepBE',
