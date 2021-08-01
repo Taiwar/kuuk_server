@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import {
@@ -16,7 +16,7 @@ import {
 } from '../shared/reorderingHelper';
 import { StepsService } from '../steps/steps.service';
 import GroupMappers from './group.mappers';
-import { GroupBE, GroupItemTypes } from './group.schema';
+import { DEFAULT_GROUP_NAME, GroupBE, GroupItemTypes } from './group.schema';
 
 @Injectable()
 export class GroupsService {
@@ -53,6 +53,9 @@ export class GroupsService {
 
   public async update(updateGroupInput: UpdateGroupInput): Promise<GroupDTO> {
     const groupDTO = await this.findOneById(updateGroupInput.id);
+    if (groupDTO.name === DEFAULT_GROUP_NAME) {
+      throw new BadRequestException('Cannot update default group!');
+    }
 
     await checkAllowedOrdering(
       groupDTO.sortNr,
@@ -82,6 +85,10 @@ export class GroupsService {
   }
 
   public async delete(id: string): Promise<DeletionResponse> {
+    const groupBE = await this.groupModel.findById(id);
+    if (groupBE.name === DEFAULT_GROUP_NAME) {
+      throw new BadRequestException('Cannot delete default group!');
+    }
     const deleteResult = await this.groupModel.findByIdAndDelete(id);
     const updateHigherGroups = await reorderOrderedItemsAfterDelete(
       deleteResult.sortNr,
