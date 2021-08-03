@@ -53,11 +53,17 @@ export class NotesService {
   public async update(updateNoteInput: UpdateNoteInput): Promise<NoteDTO> {
     const noteDTO = await this.findOneById(updateNoteInput.id);
 
-    await checkAllowedOrdering(
-      noteDTO.sortNr,
-      updateNoteInput.sortNr,
-      await this.countInOrderGroup(noteDTO.recipeID),
-    );
+    let count: number;
+    if (
+      updateNoteInput.groupID &&
+      updateNoteInput.groupID !== noteDTO.groupID
+    ) {
+      count = (await this.countInOrderGroup(updateNoteInput.groupID)) + 1;
+    } else {
+      count = await this.countInOrderGroup(noteDTO.groupID);
+    }
+
+    await checkAllowedOrdering(noteDTO.sortNr, updateNoteInput.sortNr, count);
 
     const update: UpdateNoteInput = {
       id: updateNoteInput.id,
@@ -77,6 +83,8 @@ export class NotesService {
       this.noteModel as Model<any>,
       noteDTO.sortNr,
       updateNoteInput.sortNr,
+      noteDTO.groupID,
+      updateNoteInput.groupID,
     );
 
     return NoteMappers.BEtoDTO(noteBE);
@@ -88,6 +96,7 @@ export class NotesService {
       deleteResult.sortNr,
       deleteResult.recipeID,
       this.noteModel as Model<any>,
+      deleteResult.groupID,
     );
     return {
       id,

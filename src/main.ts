@@ -1,6 +1,7 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
+import * as mongoose from 'mongoose';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -16,6 +17,10 @@ async function bootstrap() {
     origin: origins,
     credentials: true,
   });
+
+  if (config.get('DEBUG')) {
+    mongoose.set('debug', true);
+  }
 
   await app.listen(process.env.PORT || 3000);
   logger.log(`Application is running on: ${await app.getUrl()}`);

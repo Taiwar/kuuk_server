@@ -11,14 +11,13 @@ export async function checkAllowedOrdering(
   countInOrderGroup: number,
 ) {
   if (newSortNr && prevSortNr !== newSortNr) {
-    const allowedHighestNumber = countInOrderGroup + 1;
-    if (newSortNr > allowedHighestNumber) {
+    if (newSortNr > countInOrderGroup) {
       throw new BadRequestException(
-        `Can't update item with new sortNr ${newSortNr} because list only contains ${allowedHighestNumber} items!`,
+        `Can't update item with new sortNr ${newSortNr} because list only contains ${countInOrderGroup} items!`,
       );
     } else if (newSortNr < 0) {
       throw new BadRequestException(
-        `Can't update item with new sortNr ${newSortNr}. SortNr has to be positive!`,
+        `Can't update item with new sortNr ${newSortNr}. SortNr has to be >=1 !`,
       );
     }
   }
@@ -30,31 +29,53 @@ export async function reorderOrderedItems(
   model: Model<IngredientBE | StepBE | NoteBE | GroupBE>,
   prevSortNr: number,
   newSortNr: number,
+  prevGroupId?: string | null,
+  newGroupId?: string | null,
 ) {
-  if (prevSortNr !== newSortNr) {
-    if (newSortNr > prevSortNr) {
-      await model.updateMany(
-        {
-          id: { $ne: itemId },
-          recipeID: recipeId,
-          sortNr: { $lte: newSortNr },
-        },
-        {
-          $inc: { sortNr: -1 },
-        },
-      );
-    } else {
-      await model.updateMany(
-        {
-          id: { $ne: itemId },
-          recipeID: recipeId,
-          sortNr: { $gte: newSortNr },
-        },
-        {
-          $inc: { sortNr: 1 },
-        },
-      );
+  const isInGroup = !!prevGroupId;
+  let isMovingGroups = false;
+  if (isInGroup) {
+    if (newGroupId && prevGroupId.toString() !== newGroupId.toString()) {
+      isMovingGroups = true;
     }
+  }
+  if (prevSortNr !== newSortNr || isMovingGroups) {
+    let filter: any = {};
+    let update: any | undefined;
+    if (!isMovingGroups && newSortNr > prevSortNr) {
+      filter = {
+        _id: { $ne: itemId },
+        sortNr: { $lte: newSortNr },
+      };
+      update = {
+        $inc: { sortNr: -1 },
+      };
+    } else {
+      filter = {
+        _id: { $ne: itemId },
+        sortNr: { $gte: newSortNr },
+      };
+      update = {
+        $inc: { sortNr: 1 },
+      };
+    }
+    if (isInGroup) {
+      if (isMovingGroups) {
+        filter.groupID = newGroupId;
+        // Handle removing item from prev group
+        await reorderOrderedItemsAfterDelete(
+          prevSortNr,
+          recipeId,
+          model,
+          prevGroupId,
+        );
+      } else {
+        filter.groupID = prevGroupId;
+      }
+    } else {
+      filter.recipeID = recipeId;
+    }
+    return model.updateMany(filter, update);
   }
 }
 
@@ -62,14 +83,17 @@ export async function reorderOrderedItemsAfterDelete(
   deletedSortNr: number,
   recipeId: string,
   model: Model<IngredientBE | StepBE | NoteBE | GroupBE>,
+  groupId?: string | null,
 ): Promise<UpdateWriteOpResult> {
-  return model.updateMany(
-    {
-      recipeID: recipeId,
-      sortNr: { $gt: deletedSortNr },
-    },
-    {
-      $inc: { sortNr: -1 },
-    },
-  );
+  const filter: any = {
+    sortNr: { $gt: deletedSortNr },
+  };
+  if (groupId) {
+    filter.groupID = groupId;
+  } else {
+    filter.recipeID = recipeId;
+  }
+  return model.updateMany(filter, {
+    $inc: { sortNr: -1 },
+  });
 }

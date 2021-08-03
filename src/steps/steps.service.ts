@@ -54,11 +54,17 @@ export class StepsService {
   public async update(updateStepInput: UpdateStepInput): Promise<StepDTO> {
     const stepDTO = await this.findOneById(updateStepInput.id);
 
-    await checkAllowedOrdering(
-      stepDTO.sortNr,
-      updateStepInput.sortNr,
-      await this.countInOrderGroup(stepDTO.recipeID),
-    );
+    let count: number;
+    if (
+      updateStepInput.groupID &&
+      updateStepInput.groupID !== stepDTO.groupID
+    ) {
+      count = (await this.countInOrderGroup(updateStepInput.groupID)) + 1;
+    } else {
+      count = await this.countInOrderGroup(stepDTO.groupID);
+    }
+
+    await checkAllowedOrdering(stepDTO.sortNr, updateStepInput.sortNr, count);
 
     const update: UpdateStepInput = {
       id: updateStepInput.id,
@@ -79,6 +85,8 @@ export class StepsService {
       this.stepModel as Model<any>,
       stepDTO.sortNr,
       updateStepInput.sortNr,
+      stepDTO.groupID,
+      updateStepInput.groupID,
     );
 
     return StepMappers.BEtoDTO(stepBE);
@@ -90,6 +98,7 @@ export class StepsService {
       deleteResult.sortNr,
       deleteResult.recipeID,
       this.stepModel as Model<any>,
+      deleteResult.groupID,
     );
     return {
       id,

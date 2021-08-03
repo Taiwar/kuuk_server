@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common';
 import {
   Args,
   Mutation,
@@ -125,6 +126,14 @@ export class RecipesResolver {
   async addIngredient(
     @Args('addIngredientInput') addIngredientInput: AddIngredientInput,
   ): Promise<IngredientDTO> {
+    const groupItemType = await this.groupsService.getTypeById(
+      addIngredientInput.groupID,
+    );
+    if (groupItemType !== GroupItemTypes.IngredientBE) {
+      throw new BadRequestException(
+        `Group ${addIngredientInput.groupID} is not an ingredient group!`,
+      );
+    }
     return this.ingredientsService.create(addIngredientInput);
   }
 
@@ -132,6 +141,16 @@ export class RecipesResolver {
   async updateIngredient(
     @Args('updateIngredientInput') updateIngredientInput: UpdateIngredientInput,
   ): Promise<IngredientDTO> {
+    if (updateIngredientInput.groupID) {
+      const groupItemType = await this.groupsService.getTypeById(
+        updateIngredientInput.groupID,
+      );
+      if (groupItemType !== GroupItemTypes.IngredientBE) {
+        throw new BadRequestException(
+          `Group ${updateIngredientInput.groupID} is not an ingredient group!`,
+        );
+      }
+    }
     return this.ingredientsService.update(updateIngredientInput);
   }
 
@@ -146,6 +165,14 @@ export class RecipesResolver {
   async addStep(
     @Args('addStepInput') addStepInput: AddStepInput,
   ): Promise<StepDTO> {
+    const groupItemType = await this.groupsService.getTypeById(
+      addStepInput.groupID,
+    );
+    if (groupItemType !== GroupItemTypes.StepBE) {
+      throw new BadRequestException(
+        `Group ${addStepInput.groupID} is not a step group!`,
+      );
+    }
     return this.stepService.create(addStepInput);
   }
 
@@ -153,6 +180,16 @@ export class RecipesResolver {
   async updateStep(
     @Args('updateStepInput') updateStepInput: UpdateStepInput,
   ): Promise<StepDTO> {
+    if (updateStepInput.groupID) {
+      const groupItemType = await this.groupsService.getTypeById(
+        updateStepInput.groupID,
+      );
+      if (groupItemType !== GroupItemTypes.StepBE) {
+        throw new BadRequestException(
+          `Group ${updateStepInput.groupID} is not a step group!`,
+        );
+      }
+    }
     return this.stepService.update(updateStepInput);
   }
 
@@ -167,6 +204,14 @@ export class RecipesResolver {
   async addNote(
     @Args('addNoteInput') addNoteInput: AddNoteInput,
   ): Promise<NoteDTO> {
+    const groupItemType = await this.groupsService.getTypeById(
+      addNoteInput.groupID,
+    );
+    if (groupItemType !== GroupItemTypes.NoteBE) {
+      throw new BadRequestException(
+        `Group ${addNoteInput.groupID} is not a note group!`,
+      );
+    }
     return this.notesService.create(addNoteInput);
   }
 
@@ -174,6 +219,16 @@ export class RecipesResolver {
   async updateNote(
     @Args('updateNoteInput') updateNoteInput: UpdateNoteInput,
   ): Promise<NoteDTO> {
+    if (updateNoteInput.groupID) {
+      const groupItemType = await this.groupsService.getTypeById(
+        updateNoteInput.groupID,
+      );
+      if (groupItemType !== GroupItemTypes.NoteBE) {
+        throw new BadRequestException(
+          `Group ${updateNoteInput.groupID} is not a note group!`,
+        );
+      }
+    }
     return this.notesService.update(updateNoteInput);
   }
 

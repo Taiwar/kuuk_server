@@ -30,10 +30,19 @@ export class GroupsService {
     private readonly groupModel: Model<GroupBE>,
   ) {}
 
-  public async countInOrderGroup(recipeId: string): Promise<number> {
+  public async countInOrderGroup(
+    recipeId: string,
+    itemType: GroupItemTypes,
+  ): Promise<number> {
     return this.groupModel.countDocuments({
       recipeID: recipeId,
+      itemType,
     });
+  }
+
+  public async getTypeById(id: string): Promise<GroupItemTypes> {
+    return (await this.groupModel.findById(id, 'itemType'))
+      .itemType as GroupItemTypes;
   }
 
   public async findOneById(id: string): Promise<GroupDTO> {
@@ -45,7 +54,11 @@ export class GroupsService {
       recipeID: addGroupInput.recipeID,
       name: addGroupInput.name,
       itemType: addGroupInput.itemType,
-      sortNr: (await this.countInOrderGroup(addGroupInput.recipeID)) + 1,
+      sortNr:
+        (await this.countInOrderGroup(
+          addGroupInput.recipeID,
+          addGroupInput.itemType as GroupItemTypes,
+        )) + 1,
     });
     await newGroupBE.save();
     return GroupMappers.BEtoDTO(newGroupBE);
@@ -60,7 +73,10 @@ export class GroupsService {
     await checkAllowedOrdering(
       groupDTO.sortNr,
       updateGroupInput.sortNr,
-      await this.countInOrderGroup(groupDTO.recipeID),
+      await this.countInOrderGroup(
+        groupDTO.recipeID,
+        groupDTO.itemType as GroupItemTypes,
+      ),
     );
 
     const update: UpdateGroupInput = {

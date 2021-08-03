@@ -58,10 +58,20 @@ export class IngredientsService {
   ): Promise<IngredientDTO> {
     const ingredientDTO = await this.findOneById(updateIngredientInput.id);
 
+    let count: number;
+    if (
+      updateIngredientInput.groupID &&
+      updateIngredientInput.groupID !== ingredientDTO.groupID
+    ) {
+      count = (await this.countInOrderGroup(updateIngredientInput.groupID)) + 1;
+    } else {
+      count = await this.countInOrderGroup(ingredientDTO.groupID);
+    }
+
     await checkAllowedOrdering(
       ingredientDTO.sortNr,
       updateIngredientInput.sortNr,
-      await this.countInOrderGroup(ingredientDTO.recipeID),
+      count,
     );
 
     const update: UpdateIngredientInput = {
@@ -84,6 +94,8 @@ export class IngredientsService {
       this.ingredientModel as Model<any>,
       ingredientDTO.sortNr,
       updateIngredientInput.sortNr,
+      ingredientDTO.groupID,
+      updateIngredientInput.groupID,
     );
 
     return IngredientMappers.BEtoDTO(ingredientBE);
