@@ -40,7 +40,7 @@ export async function reorderOrderedItems(
     }
   }
   if (prevSortNr !== newSortNr || isMovingGroups) {
-    let filter: any = {};
+    let filter: any;
     let update: any | undefined;
     if (!isMovingGroups && newSortNr > prevSortNr) {
       filter = {

@@ -37,7 +37,7 @@ type NoteDTO implements OrderedRecipeItemDTO & GroupItem {
   groupID: String!
 }
 
-type IngredientDTO implements OrderedRecipeItemDTO & GroupItem {
+interface Ingredient implements OrderedRecipeItemDTO & GroupItem {
   id: String!
   recipeID: String!
   name: String!
@@ -45,6 +45,33 @@ type IngredientDTO implements OrderedRecipeItemDTO & GroupItem {
   unit: String!
   sortNr: Int!
   groupID: String!
+}
+
+interface ReorderInfo {
+  prevSortNr: Int,
+  prevGroupID: String
+}
+
+type IngredientDTO implements Ingredient & OrderedRecipeItemDTO & GroupItem {
+  id: String!
+  recipeID: String!
+  name: String!
+  amount: Float!
+  unit: String!
+  sortNr: Int!
+  groupID: String!
+}
+
+type IngredientUpdateResponse implements Ingredient & OrderedRecipeItemDTO & GroupItem & ReorderInfo {
+  id: String!
+  recipeID: String!
+  name: String!
+  amount: Float!
+  unit: String!
+  sortNr: Int!
+  groupID: String!
+  prevSortNr: Int,
+  prevGroupID: String
 }
 
 type RecipeDTO {
@@ -174,6 +201,7 @@ type GroupItemDeletionResponse implements GroupItem {
   id: String!
   groupID: String!
   success: Boolean!
+  sortNr: Int!
 }
 
 type Query {
@@ -191,7 +219,7 @@ type Mutation {
   deleteRecipe(id: String!): DeletionResponse
 
   addIngredient(addIngredientInput: AddIngredientInput): IngredientDTO
-  updateIngredient(updateIngredientInput: UpdateIngredientInput): IngredientDTO
+  updateIngredient(updateIngredientInput: UpdateIngredientInput): IngredientUpdateResponse
   removeIngredient(ingredientID: String!): GroupItemDeletionResponse
 
   addStep(addStepInput: AddStepInput): StepDTO

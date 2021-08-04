@@ -5,6 +5,7 @@ import {
   AddIngredientInput,
   GroupItemDeletionResponse,
   IngredientDTO,
+  IngredientUpdateResponse,
   UpdateIngredientInput,
 } from '../graphql';
 import {
@@ -55,7 +56,7 @@ export class IngredientsService {
 
   public async update(
     updateIngredientInput: UpdateIngredientInput,
-  ): Promise<IngredientDTO> {
+  ): Promise<IngredientUpdateResponse> {
     const ingredientDTO = await this.findOneById(updateIngredientInput.id);
 
     let count: number;
@@ -98,7 +99,18 @@ export class IngredientsService {
       updateIngredientInput.groupID,
     );
 
-    return IngredientMappers.BEtoDTO(ingredientBE);
+    console.log('returning', {
+      ...IngredientMappers.BEtoDTO(ingredientBE),
+      prevSortNr: ingredientDTO.sortNr,
+      prevGroupID: ingredientDTO.groupID,
+    });
+
+    return {
+      ...IngredientMappers.BEtoDTO(ingredientBE),
+      prevSortNr: ingredientDTO.sortNr,
+      prevGroupID: ingredientDTO.groupID,
+      __typename: 'IngredientUpdateResponse',
+    };
   }
 
   public async delete(id: string): Promise<GroupItemDeletionResponse> {
@@ -112,6 +124,7 @@ export class IngredientsService {
       id,
       groupID: deleteResult.groupID,
       success: !!updateHigherIngredients,
+      sortNr: deleteResult.sortNr,
     };
   }
 
