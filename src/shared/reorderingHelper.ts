@@ -39,6 +39,7 @@ export async function reorderOrderedItems(
       isMovingGroups = true;
     }
   }
+  // TODO: When moving groups, this still produces non-consecutive numberings. Need to double-check the newly added secondary "gt" and "lt" conditions
   if (prevSortNr !== newSortNr || isMovingGroups) {
     let filter: any;
     let update: any | undefined;

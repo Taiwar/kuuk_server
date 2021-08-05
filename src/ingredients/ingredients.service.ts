@@ -4,8 +4,8 @@ import { Model } from 'mongoose';
 import {
   AddIngredientInput,
   GroupItemDeletionResponse,
+  GroupItemUpdateResponse,
   IngredientDTO,
-  IngredientUpdateResponse,
   UpdateIngredientInput,
 } from '../graphql';
 import {
@@ -56,7 +56,7 @@ export class IngredientsService {
 
   public async update(
     updateIngredientInput: UpdateIngredientInput,
-  ): Promise<IngredientUpdateResponse> {
+  ): Promise<GroupItemUpdateResponse> {
     const ingredientDTO = await this.findOneById(updateIngredientInput.id);
 
     let count: number;
@@ -99,14 +99,8 @@ export class IngredientsService {
       updateIngredientInput.groupID,
     );
 
-    console.log('returning', {
-      ...IngredientMappers.BEtoDTO(ingredientBE),
-      prevSortNr: ingredientDTO.sortNr,
-      prevGroupID: ingredientDTO.groupID,
-    });
-
     return {
-      ...IngredientMappers.BEtoDTO(ingredientBE),
+      item: IngredientMappers.BEtoDTO(ingredientBE),
       prevSortNr: ingredientDTO.sortNr,
       prevGroupID: ingredientDTO.groupID,
     };

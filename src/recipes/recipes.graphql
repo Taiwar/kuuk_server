@@ -62,18 +62,6 @@ type IngredientDTO implements Ingredient & OrderedRecipeItemDTO & GroupItem {
   groupID: String!
 }
 
-type IngredientUpdateResponse implements Ingredient & OrderedRecipeItemDTO & GroupItem & ReorderInfo {
-  id: String!
-  recipeID: String!
-  name: String!
-  amount: Float!
-  unit: String!
-  sortNr: Int!
-  groupID: String!
-  prevSortNr: Int,
-  prevGroupID: String
-}
-
 type RecipeDTO {
   id: String!
   name: String!
@@ -204,6 +192,14 @@ type GroupItemDeletionResponse implements GroupItem {
   sortNr: Int!
 }
 
+union GroupItemDTO = IngredientDTO | StepDTO | NoteDTO
+
+type GroupItemUpdateResponse implements ReorderInfo {
+  item: GroupItemDTO!,
+  prevSortNr: Int,
+  prevGroupID: String
+}
+
 type Query {
   recipes: [RecipeDTO!]!
   tags: [String!]!
@@ -219,15 +215,15 @@ type Mutation {
   deleteRecipe(id: String!): DeletionResponse
 
   addIngredient(addIngredientInput: AddIngredientInput): IngredientDTO
-  updateIngredient(updateIngredientInput: UpdateIngredientInput): IngredientUpdateResponse
+  updateIngredient(updateIngredientInput: UpdateIngredientInput): GroupItemUpdateResponse
   removeIngredient(ingredientID: String!): GroupItemDeletionResponse
 
   addStep(addStepInput: AddStepInput): StepDTO
-  updateStep(updateStepInput: UpdateStepInput): StepDTO
+  updateStep(updateStepInput: UpdateStepInput): GroupItemUpdateResponse
   removeStep(stepID: String!): GroupItemDeletionResponse
 
   addNote(addNoteInput: AddNoteInput): NoteDTO
-  updateNote(updateNoteInput: UpdateNoteInput): NoteDTO
+  updateNote(updateNoteInput: UpdateNoteInput): GroupItemUpdateResponse
   removeNote(noteID: String!): GroupItemDeletionResponse
 
   addGroup(addGroupInput: AddGroupInput): GroupDTO

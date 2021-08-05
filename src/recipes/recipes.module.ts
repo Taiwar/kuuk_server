@@ -4,6 +4,7 @@ import { GroupsModule } from '../groups/groups.module';
 import { IngredientsModule } from '../ingredients/ingredients.module';
 import { NotesModule } from '../notes/notes.module';
 import { StepsModule } from '../steps/steps.module';
+import { GroupItemDtoResolver } from './group-item-dto.resolver';
 import { OrderedRecipeItemDtoResolver } from './ordered-recipe-item-dto.resolver';
 import { RecipeBE, RecipeMongoSchema } from './recipe.schema';
 import { RecipesResolver } from './recipes.resolver';
@@ -19,7 +20,12 @@ import { RecipesService } from './recipes.service';
       { name: RecipeBE.name, schema: RecipeMongoSchema },
     ]),
   ],
-  providers: [RecipesService, RecipesResolver, OrderedRecipeItemDtoResolver],
+  providers: [
+    RecipesService,
+    RecipesResolver,
+    OrderedRecipeItemDtoResolver,
+    GroupItemDtoResolver,
+  ],
   exports: [RecipesService],
 })
 export class RecipesModule {}

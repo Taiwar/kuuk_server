@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import {
   AddStepInput,
   GroupItemDeletionResponse,
+  GroupItemUpdateResponse,
   StepDTO,
   UpdateStepInput,
 } from '../graphql';
@@ -51,7 +52,9 @@ export class StepsService {
     return StepMappers.BEtoDTO(newStepBE);
   }
 
-  public async update(updateStepInput: UpdateStepInput): Promise<StepDTO> {
+  public async update(
+    updateStepInput: UpdateStepInput,
+  ): Promise<GroupItemUpdateResponse> {
     const stepDTO = await this.findOneById(updateStepInput.id);
 
     let count: number;
@@ -89,7 +92,11 @@ export class StepsService {
       updateStepInput.groupID,
     );
 
-    return StepMappers.BEtoDTO(stepBE);
+    return {
+      item: StepMappers.BEtoDTO(stepBE),
+      prevSortNr: stepDTO.sortNr,
+      prevGroupID: stepDTO.groupID,
+    };
   }
 
   public async delete(id: string): Promise<GroupItemDeletionResponse> {

@@ -17,8 +17,8 @@ import {
   FilterRecipesInput,
   GroupDTO,
   GroupItemDeletionResponse,
+  GroupItemUpdateResponse,
   IngredientDTO,
-  IngredientUpdateResponse,
   NoteDTO,
   RecipeDTO,
   StepDTO,
@@ -141,7 +141,7 @@ export class RecipesResolver {
   @Mutation()
   async updateIngredient(
     @Args('updateIngredientInput') updateIngredientInput: UpdateIngredientInput,
-  ): Promise<IngredientUpdateResponse> {
+  ): Promise<GroupItemUpdateResponse> {
     if (updateIngredientInput.groupID) {
       const groupItemType = await this.groupsService.getTypeById(
         updateIngredientInput.groupID,
@@ -180,7 +180,7 @@ export class RecipesResolver {
   @Mutation()
   async updateStep(
     @Args('updateStepInput') updateStepInput: UpdateStepInput,
-  ): Promise<StepDTO> {
+  ): Promise<GroupItemUpdateResponse> {
     if (updateStepInput.groupID) {
       const groupItemType = await this.groupsService.getTypeById(
         updateStepInput.groupID,
@@ -219,7 +219,7 @@ export class RecipesResolver {
   @Mutation()
   async updateNote(
     @Args('updateNoteInput') updateNoteInput: UpdateNoteInput,
-  ): Promise<NoteDTO> {
+  ): Promise<GroupItemUpdateResponse> {
     if (updateNoteInput.groupID) {
       const groupItemType = await this.groupsService.getTypeById(
         updateNoteInput.groupID,
