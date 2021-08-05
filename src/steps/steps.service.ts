@@ -104,6 +104,7 @@ export class StepsService {
       id,
       groupID: deleteResult.groupID,
       success: !!updateHigherSteps,
+      sortNr: deleteResult.sortNr,
     };
   }
 

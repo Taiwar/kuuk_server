@@ -102,6 +102,7 @@ export class NotesService {
       id,
       groupID: deleteResult.groupID,
       success: !!updateHigherNotes,
+      sortNr: deleteResult.sortNr,
     };
   }
 
