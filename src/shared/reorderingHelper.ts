@@ -45,7 +45,7 @@ export async function reorderOrderedItems(
     if (!isMovingGroups && newSortNr > prevSortNr) {
       filter = {
         _id: { $ne: itemId },
-        sortNr: { $lte: newSortNr },
+        sortNr: { $lte: newSortNr, $gt: prevSortNr },
       };
       update = {
         $inc: { sortNr: -1 },
@@ -53,7 +53,7 @@ export async function reorderOrderedItems(
     } else {
       filter = {
         _id: { $ne: itemId },
-        sortNr: { $gte: newSortNr },
+        sortNr: { $gte: newSortNr, $lt: prevSortNr },
       };
       update = {
         $inc: { sortNr: 1 },

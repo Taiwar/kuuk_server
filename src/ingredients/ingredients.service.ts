@@ -109,7 +109,6 @@ export class IngredientsService {
       ...IngredientMappers.BEtoDTO(ingredientBE),
       prevSortNr: ingredientDTO.sortNr,
       prevGroupID: ingredientDTO.groupID,
-      __typename: 'IngredientUpdateResponse',
     };
   }
 
