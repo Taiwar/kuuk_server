@@ -34,12 +34,8 @@ export async function reorderOrderedItems(
 ) {
   const isInGroup = !!prevGroupId;
   const isChangingSortNr = prevSortNr !== newSortNr;
-  let isMovingGroups = false;
-  if (isInGroup) {
-    if (newGroupId && prevGroupId.toString() !== newGroupId.toString()) {
-      isMovingGroups = true;
-    }
-  }
+  const isMovingGroups =
+    isInGroup && newGroupId && prevGroupId.toString() !== newGroupId.toString();
   if (!isChangingSortNr && !isMovingGroups) {
     return;
   }
@@ -91,6 +87,7 @@ export async function reorderOrderedItems(
   } else {
     filter.recipeID = recipeId;
   }
+  if (!filter || !update) return;
   return model.updateMany(filter, update);
 }
 
@@ -111,4 +108,33 @@ export async function reorderOrderedItemsAfterDelete(
   return model.updateMany(filter, {
     $inc: { sortNr: -1 },
   });
+}
+
+// TODO: Using this function is a band-aid solution that is probably less efficient than fixing the reordering logic to be consistent
+export async function checkItemOrderPostcondition(
+  model: Model<IngredientBE | StepBE | NoteBE | GroupBE>,
+  filter: {
+    recipeID?: string | null;
+    groupID?: string | null;
+  },
+): Promise<void> {
+  if (!filter.recipeID && !filter.groupID) {
+    throw new Error(
+      'checkItemOrderPostcondition: Filter requires either a recipeID or groupID!',
+    );
+  }
+  const items = await model.find(filter, '_id sortNr', {
+    sort: {
+      sortNr: 1,
+    },
+  });
+  let hadToFix = 0;
+  for (let i = 1; i <= items.length; i++) {
+    const item = items[i - 1];
+    if (i !== item.sortNr) {
+      await model.findByIdAndUpdate(item._id, { sortNr: i });
+      hadToFix++;
+    }
+  }
+  console.log('Completed Postcondition check. Had to fix:', hadToFix);
 }

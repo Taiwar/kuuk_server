@@ -10,6 +10,7 @@ import {
 } from '../graphql';
 import {
   checkAllowedOrdering,
+  checkItemOrderPostcondition,
   reorderOrderedItems,
   reorderOrderedItemsAfterDelete,
 } from '../shared/reorderingHelper';
@@ -58,10 +59,10 @@ export class StepsService {
     const stepDTO = await this.findOneById(updateStepInput.id);
 
     let count: number;
-    if (
+    const isMovingGroups =
       updateStepInput.groupID &&
-      updateStepInput.groupID !== stepDTO.groupID
-    ) {
+      updateStepInput.groupID.toString() !== stepDTO.groupID.toString();
+    if (isMovingGroups) {
       count = (await this.countInOrderGroup(updateStepInput.groupID)) + 1;
     } else {
       count = await this.countInOrderGroup(stepDTO.groupID);
@@ -91,6 +92,16 @@ export class StepsService {
       stepDTO.groupID,
       updateStepInput.groupID,
     );
+
+    await checkItemOrderPostcondition(this.stepModel as Model<any>, {
+      groupID: stepDTO.groupID,
+    });
+
+    if (isMovingGroups) {
+      await checkItemOrderPostcondition(this.stepModel as Model<any>, {
+        groupID: updateStepInput.groupID,
+      });
+    }
 
     return {
       item: StepMappers.BEtoDTO(stepBE),

@@ -18,7 +18,7 @@ async function bootstrap() {
     credentials: true,
   });
 
-  if (config.get('DEBUG')) {
+  if (config.get('DEBUG') === 'true') {
     mongoose.set('debug', true);
   }
 
