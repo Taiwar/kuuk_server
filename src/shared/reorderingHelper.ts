@@ -15,7 +15,7 @@ export async function checkAllowedOrdering(
       throw new BadRequestException(
         `Can't update item with new sortNr ${newSortNr} because list only contains ${countInOrderGroup} items!`,
       );
-    } else if (newSortNr < 0) {
+    } else if (newSortNr < 1) {
       throw new BadRequestException(
         `Can't update item with new sortNr ${newSortNr}. SortNr has to be >=1 !`,
       );
@@ -33,51 +33,65 @@ export async function reorderOrderedItems(
   newGroupId?: string | null,
 ) {
   const isInGroup = !!prevGroupId;
+  const isChangingSortNr = prevSortNr !== newSortNr;
   let isMovingGroups = false;
   if (isInGroup) {
     if (newGroupId && prevGroupId.toString() !== newGroupId.toString()) {
       isMovingGroups = true;
     }
   }
-  // TODO: When moving groups, this still produces non-consecutive numberings. Need to double-check the newly added secondary "gt" and "lt" conditions
-  if (prevSortNr !== newSortNr || isMovingGroups) {
-    let filter: any;
-    let update: any | undefined;
-    if (!isMovingGroups && newSortNr > prevSortNr) {
-      filter = {
-        _id: { $ne: itemId },
-        sortNr: { $lte: newSortNr, $gt: prevSortNr },
-      };
-      update = {
-        $inc: { sortNr: -1 },
-      };
-    } else {
-      filter = {
-        _id: { $ne: itemId },
-        sortNr: { $gte: newSortNr, $lt: prevSortNr },
-      };
-      update = {
-        $inc: { sortNr: 1 },
-      };
-    }
-    if (isInGroup) {
-      if (isMovingGroups) {
-        filter.groupID = newGroupId;
-        // Handle removing item from prev group
-        await reorderOrderedItemsAfterDelete(
-          prevSortNr,
-          recipeId,
-          model,
-          prevGroupId,
-        );
-      } else {
-        filter.groupID = prevGroupId;
-      }
-    } else {
-      filter.recipeID = recipeId;
-    }
-    return model.updateMany(filter, update);
+  if (!isChangingSortNr && !isMovingGroups) {
+    return;
   }
+
+  let filter: any;
+  let update: any;
+  if (newSortNr > prevSortNr) {
+    filter = {
+      _id: { $ne: itemId },
+      sortNr: { $lte: newSortNr },
+    };
+    if (!isMovingGroups) {
+      filter.sortNr = {
+        ...filter.sortNr,
+        $gt: prevSortNr,
+      };
+    }
+    update = {
+      $inc: { sortNr: -1 },
+    };
+  } else {
+    filter = {
+      _id: { $ne: itemId },
+      sortNr: { $gte: newSortNr },
+    };
+    if (!isMovingGroups) {
+      filter.sortNr = {
+        ...filter.sortNr,
+        $lt: prevSortNr,
+      };
+    }
+    update = {
+      $inc: { sortNr: 1 },
+    };
+  }
+  if (isInGroup) {
+    if (isMovingGroups) {
+      filter.groupID = newGroupId;
+      // Handle removing item from prev group
+      await reorderOrderedItemsAfterDelete(
+        prevSortNr,
+        recipeId,
+        model,
+        prevGroupId,
+      );
+    } else {
+      filter.groupID = prevGroupId;
+    }
+  } else {
+    filter.recipeID = recipeId;
+  }
+  return model.updateMany(filter, update);
 }
 
 export async function reorderOrderedItemsAfterDelete(
