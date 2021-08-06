@@ -112,6 +112,11 @@ export class RecipesResolver {
   }
 
   @Mutation()
+  async importRecipe(@Args('url') url: string): Promise<RecipeDTO> {
+    return this.recipesService.import(url);
+  }
+
+  @Mutation()
   async updateRecipe(
     @Args('updateRecipeInput') updateRecipeInput: UpdateRecipeInput,
   ): Promise<RecipeDTO> {

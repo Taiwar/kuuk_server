@@ -10,6 +10,9 @@ import {
 } from '../graphql';
 import { DEFAULT_GROUP_NAME, GroupItemTypes } from '../groups/group.schema';
 import { GroupsService } from '../groups/groups.service';
+import { IngredientsService } from '../ingredients/ingredients.service';
+import { StepsService } from '../steps/steps.service';
+import { RecipeImporter } from './recipe-importer';
 import RecipeMappers from './recipe.mappers';
 import { RecipeBE } from './recipe.schema';
 import slugify from 'slugify';
@@ -21,6 +24,8 @@ export class RecipesService {
   constructor(
     @InjectModel(RecipeBE.name)
     private readonly recipeModel: Model<RecipeBE>,
+    private readonly ingredientsService: IngredientsService,
+    private readonly stepsService: StepsService,
     private readonly groupsService: GroupsService,
   ) {}
 
@@ -150,5 +155,54 @@ export class RecipesService {
 
   async getAllTags(): Promise<string[]> {
     return this.recipeModel.distinct('tags');
+  }
+
+  async import(url: string): Promise<RecipeDTO> {
+    const importer = new RecipeImporter(url);
+    await importer.fetchRecipe();
+    importer.extractJsonld();
+    importer.parseJsonld();
+
+    const recipeDTO = await this.create(importer.recipe);
+    const defaultIngredientGroupDTO = (
+      await this.groupsService.findAllByRecipeIDAndItemType(
+        recipeDTO.id,
+        GroupItemTypes.IngredientBE,
+      )
+    ).filter((g) => g.name === DEFAULT_GROUP_NAME)[0];
+    const defaultStepGroupDTO = (
+      await this.groupsService.findAllByRecipeIDAndItemType(
+        recipeDTO.id,
+        GroupItemTypes.StepBE,
+      )
+    ).filter((g) => g.name === DEFAULT_GROUP_NAME)[0];
+    for (const ingredient of importer.ingredients) {
+      await this.ingredientsService.create({
+        ...ingredient,
+        recipeID: recipeDTO.id,
+        groupID: defaultIngredientGroupDTO.id,
+      });
+    }
+    for (const stepGroup of importer.stepGroups) {
+      const groupDTO = await this.groupsService.create({
+        ...stepGroup,
+        recipeID: recipeDTO.id,
+      });
+      for (const step of stepGroup.items) {
+        await this.stepsService.create({
+          ...step,
+          recipeID: recipeDTO.id,
+          groupID: groupDTO.id,
+        });
+      }
+    }
+    for (const step of importer.steps) {
+      await this.stepsService.create({
+        ...step,
+        recipeID: recipeDTO.id,
+        groupID: defaultStepGroupDTO.id,
+      });
+    }
+    return recipeDTO;
   }
 }

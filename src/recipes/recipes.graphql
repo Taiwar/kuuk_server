@@ -211,6 +211,7 @@ type Query {
 
 type Mutation {
   createRecipe(createRecipeInput: CreateRecipeInput): RecipeDTO
+  importRecipe(url: String!): RecipeDTO
   updateRecipe(updateRecipeInput: UpdateRecipeInput): RecipeDTO
   deleteRecipe(id: String!): DeletionResponse
 
