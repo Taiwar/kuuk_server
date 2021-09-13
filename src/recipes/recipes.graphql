@@ -48,7 +48,7 @@ interface Ingredient implements OrderedRecipeItemDTO & GroupItem {
 }
 
 interface ReorderInfo {
-  prevSortNr: Int,
+  prevSortNr: Int
   prevGroupID: String
 }
 
@@ -195,8 +195,8 @@ type GroupItemDeletionResponse implements GroupItem {
 union GroupItemDTO = IngredientDTO | StepDTO | NoteDTO
 
 type GroupItemUpdateResponse implements ReorderInfo {
-  item: GroupItemDTO!,
-  prevSortNr: Int,
+  item: GroupItemDTO!
+  prevSortNr: Int
   prevGroupID: String
 }
 
@@ -216,7 +216,9 @@ type Mutation {
   deleteRecipe(id: String!): DeletionResponse
 
   addIngredient(addIngredientInput: AddIngredientInput): IngredientDTO
-  updateIngredient(updateIngredientInput: UpdateIngredientInput): GroupItemUpdateResponse
+  updateIngredient(
+    updateIngredientInput: UpdateIngredientInput
+  ): GroupItemUpdateResponse
   removeIngredient(ingredientID: String!): GroupItemDeletionResponse
 
   addStep(addStepInput: AddStepInput): StepDTO
